@@ -11,53 +11,59 @@ import com.pb.noobchain.domain.Block;
 import com.pb.noobchain.exceptions.BrokenChainException;
 import com.pb.noobchain.exceptions.UnequalCurrentHashException;
 import com.pb.noobchain.exceptions.UnminedChainException;
-import com.pb.noobchain.service.BlockchainService;
+import com.pb.noobchain.service.BlockChainService;
 
 import com.google.gson.GsonBuilder;
 
-public class BlockchainServiceImpl implements BlockchainService
+public class BlockChainServiceImpl implements BlockChainService
 {
-    private static final Logger log = LoggerFactory.getLogger(BlockchainServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(BlockChainServiceImpl.class);
 
     @Override
     public List<Block> myFirstChain(int difficulty) {
-        final List<Block> blockchain = Lists.newArrayList();
-        Block genesisBlock = new Block("Hi im the first block", "0");
-        blockchain.add(genesisBlock);
-        log.info("Hash for block 1 : {}", genesisBlock.getHash());
+        final List<Block> blockChain = Lists.newLinkedList();
+        Block genesisBlock = createGenesis(difficulty);
+        blockChain.add(genesisBlock);
+
+        Block block2 = addBlock(blockChain, 2, genesisBlock, difficulty);
+        addBlock(blockChain, 3, block2, difficulty);
+
+        return blockChain;
+    }
+
+    private Block createGenesis(int difficulty) {
+        Block genesisBlock = new Block("Hi im the genesis block", "0");
+        log.info("Hash for genesis block : {}", genesisBlock.getHash());
         genesisBlock.mine(difficulty);
+        return genesisBlock;
+    }
 
-        Block block2 = new Block("Im the 2nd block", genesisBlock.getHash());
-        blockchain.add(block2);
-        log.info("Hash for block 2 : {}", block2.getHash());
-        block2.mine(difficulty);
-
-        Block block3 = new Block("Im the 3rd block", block2.getHash());
-        blockchain.add(block3);
-        log.info("Hash for block 3 : {}", block3.getHash());
-        block3.mine(difficulty);
-
-        return blockchain;
+    private Block addBlock(List<Block> blockChain, int index, Block previous, int difficulty) {
+        Block block = new Block(String.format("Im the %s block", index), previous.getHash());
+        log.info("Hash for block {} : {}", index, block.getHash());
+        block.mine(difficulty);
+        blockChain.add(block);
+        return block;
     }
 
     @Override
-    public String serialize(final List<Block> blockchain) {
-        String json = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
+    public String serialize(final List<Block> blockChain) {
+        String json = new GsonBuilder().setPrettyPrinting().create().toJson(blockChain);
         log.info(json);
         return json;
     }
 
     @Override
-    public boolean isChainValid(final List<Block> blockchain, int difficulty) {
+    public boolean validateChain(final List<Block> blockChain, int difficulty) {
         Block currentBlock;
         Block previousBlock;
         String hashTarget = new String(new char[difficulty]).replace('\0', '0');
-        Assert.isTrue(blockchain.size() >= 1);
+        Assert.isTrue(blockChain.size() >= 1);
 
         //loop through blockchain to check hashes:
-        for (int i=1; i < blockchain.size(); i++) {
-            currentBlock = blockchain.get(i);
-            previousBlock = blockchain.get(i-1);
+        for (int i=1; i < blockChain.size(); i++) {
+            currentBlock = blockChain.get(i);
+            previousBlock = blockChain.get(i-1);
             //compare registered hash and calculated hash:
             if (!currentBlock.getHash().equals(currentBlock.calculateHash())){
                 UnequalCurrentHashException ex = new UnequalCurrentHashException();
@@ -82,11 +88,11 @@ public class BlockchainServiceImpl implements BlockchainService
 
 
     @Override
-    public List<Block> tryMining(final List<Block> blockchain, final int difficulty) {
-        for (Block block : blockchain) {
+    public List<Block> tryMining(final List<Block> blockChain, final int difficulty) {
+        for (Block block : blockChain) {
             log.info("Trying to mine block: {} ...", block);
             block.mine(difficulty);
         }
-        return blockchain;
+        return blockChain;
     }
 }
