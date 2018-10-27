@@ -4,9 +4,13 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import com.google.common.collect.Lists;
 import com.pb.noobchain.domain.Block;
+import com.pb.noobchain.exceptions.BrokenChainException;
+import com.pb.noobchain.exceptions.UnequalCurrentHashException;
+import com.pb.noobchain.exceptions.UnminedChainException;
 import com.pb.noobchain.service.BlockchainService;
 
 import com.google.gson.GsonBuilder;
@@ -48,25 +52,29 @@ public class BlockchainServiceImpl implements BlockchainService
         Block currentBlock;
         Block previousBlock;
         String hashTarget = new String(new char[difficulty]).replace('\0', '0');
+        Assert.isTrue(blockchain.size() >= 1);
 
         //loop through blockchain to check hashes:
         for (int i=1; i < blockchain.size(); i++) {
             currentBlock = blockchain.get(i);
             previousBlock = blockchain.get(i-1);
             //compare registered hash and calculated hash:
-            if (!currentBlock.getHash().equals(currentBlock.calculateHash()) ){
-                log.error("Current Hashes not equal");
-                return false;
+            if (!currentBlock.getHash().equals(currentBlock.calculateHash())){
+                UnequalCurrentHashException ex = new UnequalCurrentHashException();
+                log.error(ex.getMessage());
+                throw ex;
             }
             //compare previous hash and registered previous hash
-            if (!previousBlock.getHash().equals(currentBlock.getPreviousHash()) ) {
-                log.error("Previous Hashes not equal");
-                return false;
+            if (!previousBlock.getHash().equals(currentBlock.getPreviousHash())) {
+                BrokenChainException ex = new BrokenChainException();
+                log.error(ex.getMessage());
+                throw ex;
             }
             //check if hash is solved
             if (!currentBlock.getHash().substring(0, difficulty).equals(hashTarget)) {
-                log.error("This block hasn't been mined");
-                return false;
+                UnminedChainException ex = new UnminedChainException();
+                log.error(ex.getMessage());
+                throw ex;
             }
         }
         return true;
