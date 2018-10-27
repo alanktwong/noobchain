@@ -6,8 +6,12 @@ import com.pb.noobchain.domain.Block;
 
 public interface BlockchainService
 {
-    List<Block> myFirstChain();
+    List<Block> myFirstChain(int difficulty);
 
-    boolean isChainValid(final List<Block> blockchain);
+    String serialize(final List<Block> blockchain);
+
+    boolean isChainValid(final List<Block> blockchain, final int difficulty);
+
+    List<Block> tryMining(final List<Block> blockchain, final int difficulty);
 
 }
