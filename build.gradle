@@ -195,6 +195,11 @@ dependencies {
     compile "mysql:mysql-connector-java"
     compile "com.h2database:h2"
     compile "org.mapstruct:mapstruct-jdk8:${mapstruct_version}"
+    // https://mvnrepository.com/artifact/org.projectlombok/lombok
+    provided group: 'org.projectlombok', name: 'lombok', version: '1.18.2'
+
+
+
     testCompile "org.awaitility:awaitility:${awaitility_version}"
     testCompile "com.jayway.jsonpath:json-path"
     testCompile ("org.springframework.boot:spring-boot-starter-test") {
