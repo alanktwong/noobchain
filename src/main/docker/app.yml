@@ -1,0 +1,19 @@
+version: '2'
+services:
+    noobchain-app:
+        image: noobchain
+        environment:
+            - SPRING_PROFILES_ACTIVE=prod,swagger
+            - SPRING_DATASOURCE_URL=jdbc:mysql://noobchain-mysql:3306/noobchain?useUnicode=true&characterEncoding=utf8&useSSL=false
+            - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
+            - SPRING_DATA_ELASTICSEARCH_CLUSTER_NODES=noobchain-elasticsearch:9300
+        ports:
+            - 8080:8080
+    noobchain-mysql:
+        extends:
+            file: mysql.yml
+            service: noobchain-mysql
+    noobchain-elasticsearch:
+        extends:
+            file: elasticsearch.yml
+            service: noobchain-elasticsearch
