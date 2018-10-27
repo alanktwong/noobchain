@@ -1,6 +1,11 @@
 # noobchain
 This application was generated using JHipster 4.6.2, you can find documentation and help at [https://jhipster.github.io/documentation-archive/v4.6.2](https://jhipster.github.io/documentation-archive/v4.6.2).
 
+The purpose of this application is to expose in a JHipster monolith, a blockchain prototype
+
+* [Creating Your First Blockchain with Java. Part 1](https://medium.com/programmers-blockchain/create-simple-blockchain-java-tutorial-from-scratch-6eeed3cb03fa) or [its github](https://github.com/CryptoKass/NoobChain-Tutorial-Part-1)
+* [Creating Your First Blockchain with Java. Part 2 — Transactions](https://medium.com/programmers-blockchain/creating-your-first-blockchain-with-java-part-2-transactions-2cdac335e0ce) or [its github](https://github.com/CryptoKass/NoobChain-Tutorial-Part-1) or [its github](https://github.com/CryptoKass/NoobChain-Tutorial-Part-2)
+
 ## Development
 
 Before you can build this project, you must install and configure the following dependencies on your machine:
