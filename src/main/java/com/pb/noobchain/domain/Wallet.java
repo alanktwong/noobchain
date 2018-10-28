@@ -5,7 +5,7 @@ import java.security.*;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
-import com.pb.noobchain.service.HashUtil;
+import com.pb.noobchain.service.util.HashUtil;
 
 public class Wallet {
     private String id;

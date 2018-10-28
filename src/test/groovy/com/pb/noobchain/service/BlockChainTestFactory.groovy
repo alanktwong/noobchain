@@ -5,6 +5,7 @@ import com.pb.noobchain.domain.Transaction
 import com.pb.noobchain.domain.TransactionOutput
 import com.pb.noobchain.domain.Wallet
 import com.pb.noobchain.repository.TransactionRepository
+import com.pb.noobchain.service.util.HashUtil
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

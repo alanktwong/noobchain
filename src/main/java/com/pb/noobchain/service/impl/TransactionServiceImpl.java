@@ -18,7 +18,7 @@ import com.pb.noobchain.domain.TransactionInput;
 import com.pb.noobchain.domain.TransactionOutput;
 import com.pb.noobchain.domain.Wallet;
 import com.pb.noobchain.repository.TransactionRepository;
-import com.pb.noobchain.service.HashUtil;
+import com.pb.noobchain.service.util.HashUtil;
 import com.pb.noobchain.service.TransactionService;
 
 public class TransactionServiceImpl implements TransactionService

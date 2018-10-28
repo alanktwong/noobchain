@@ -1,4 +1,4 @@
-package com.pb.noobchain.service;
+package com.pb.noobchain.service.util;
 
 import java.security.Key;
 import java.security.KeyPair;
@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.pb.noobchain.domain.Transaction;
-import com.pb.noobchain.domain.Wallet;
 
 public class HashUtil
 {

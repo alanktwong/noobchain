@@ -2,7 +2,7 @@ package com.pb.noobchain.domain;
 
 import java.security.PublicKey;
 
-import com.pb.noobchain.service.HashUtil;
+import com.pb.noobchain.service.util.HashUtil;
 
 public class TransactionOutput
 {

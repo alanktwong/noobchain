@@ -4,7 +4,7 @@ import java.security.*;
 import java.util.*;
 
 import com.google.common.collect.Lists;
-import com.pb.noobchain.service.HashUtil;
+import com.pb.noobchain.service.util.HashUtil;
 
 public class Transaction {
     // this is also the hash of the transaction.

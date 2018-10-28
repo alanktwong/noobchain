@@ -6,7 +6,7 @@ import com.pb.noobchain.domain.Wallet
 import com.pb.noobchain.repository.TransactionRepository
 import com.pb.noobchain.repository.impl.TransactionRepositoryImpl
 import com.pb.noobchain.service.BlockChainTestFactory
-import com.pb.noobchain.service.HashUtil
+import com.pb.noobchain.service.util.HashUtil
 import com.pb.noobchain.service.BlockChainService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
