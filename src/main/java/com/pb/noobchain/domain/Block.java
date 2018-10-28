@@ -14,6 +14,8 @@ public class Block
 {
     private static final Logger log = LoggerFactory.getLogger(Block.class);
 
+    private long id;
+
     private String hash;
 
     private String previousHash;
@@ -23,12 +25,16 @@ public class Block
     //our data will be a simple message.
     public List<Transaction> transactions = new ArrayList<>();
 
-    private long timeStamp; //as number of milliseconds since 1/1/1970.
+    //as number of milliseconds since 1/1/1970.
+    private long timeStamp;
 
     private int nonce;
 
+    private boolean mined;
+
     //Block Constructor.
-    public Block(String previousHash) {
+    public Block(long id, String previousHash) {
+        this.id = id;
         this.previousHash = previousHash;
         this.timeStamp = new Date().getTime();
         this.hash = calculateHash();
@@ -46,7 +52,11 @@ public class Block
         return calculateHashImpl(getPreviousHash(), getTimeStamp(), getMerkleRoot());
     }
 
-    private void mineImpl(Block block, int difficulty) {
+    private boolean mineImpl(Block block, int difficulty) {
+        if (isMined()) {
+            log.info("Block {} already mined!!!", block.getId());
+            return isMined();
+        }
         String merkleRoot = HashUtil.getMerkleRoot(block.getTransactions());
         block.setMerkleRoot(merkleRoot);
 
@@ -58,11 +68,23 @@ public class Block
             block.setNonce(nonce);
             block.setHash(block.calculateHash());
         }
-        log.info("Block Mined!!! New hash: {}", block.getHash());
+        this.mined = true;
+        log.info("Block {} mined!!! New hash: {}", block.getId(), block.getHash());
+        return mined;
     }
 
-    public void mine(int difficulty) {
-       mineImpl(this, difficulty);
+    public boolean mine(int difficulty) {
+       return mineImpl(this, difficulty);
+    }
+
+    public long getId()
+    {
+        return id;
+    }
+
+    public void setId(final long id)
+    {
+        this.id = id;
     }
 
     public String getHash()
@@ -123,6 +145,11 @@ public class Block
     public void setTransactions(final List<Transaction> transactions)
     {
         this.transactions = transactions;
+    }
+
+    public boolean isMined()
+    {
+        return mined;
     }
 
     @Override

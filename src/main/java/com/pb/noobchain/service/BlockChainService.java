@@ -4,14 +4,13 @@ import java.util.List;
 
 import com.pb.noobchain.domain.Block;
 
-public interface BlockChainService extends TransactionDomainService
+public interface BlockChainService
 {
-    List<Block> myFirstChain(int difficulty);
+    List<Block> myFirstChain();
 
     String serialize(final List<Block> blockChain);
 
-    boolean validateChain(final List<Block> blockChain, final int difficulty);
+    boolean validateChain(final List<Block> blockChain);
 
-    List<Block> tryMining(final List<Block> blockChain, final int difficulty);
-
+    List<Block> tryMining(final List<Block> blockChain);
 }

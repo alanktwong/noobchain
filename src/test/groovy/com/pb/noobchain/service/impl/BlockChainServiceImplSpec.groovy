@@ -1,30 +1,23 @@
 package com.pb.noobchain.service.impl
 
 import com.pb.noobchain.domain.Block
-import com.pb.noobchain.domain.Transaction
-import com.pb.noobchain.domain.Wallet
 import com.pb.noobchain.exceptions.BrokenChainException
 import com.pb.noobchain.exceptions.UnequalCurrentHashException
 import com.pb.noobchain.exceptions.UnminedChainException
-import com.pb.noobchain.service.HashUtil
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import spock.lang.Specification
 
 class BlockChainServiceImplSpec extends Specification {
-
-    private static final Logger LOG = LoggerFactory.getLogger(BlockChainServiceImplSpec)
 
     BlockChainServiceImpl service
     def difficulty = 5
 
     def setup() {
-        service = new BlockChainServiceImpl(minimumTransaction: 0.01)
+        service = new BlockChainServiceImpl(difficulty: difficulty)
     }
 
     def "create my 1st chain"() {
         when:
-          def chain = service.myFirstChain(difficulty)
+          def chain = service.myFirstChain()
 
         then:
           chain != null && !chain.isEmpty()
@@ -32,7 +25,7 @@ class BlockChainServiceImplSpec extends Specification {
 
     def "serialize my 1st chain"() {
         given:
-            def chain = service.myFirstChain(difficulty)
+            def chain = service.myFirstChain()
 
         when:
             def json = service.serialize(chain)
@@ -43,10 +36,10 @@ class BlockChainServiceImplSpec extends Specification {
 
     def "should validate my 1st chain"() {
         given:
-            def chain = service.myFirstChain(difficulty)
+            def chain = service.myFirstChain()
 
         when:
-            def valid = service.validateChain(chain, difficulty)
+            def valid = service.validateChain(chain)
 
         then:
             valid
@@ -54,12 +47,12 @@ class BlockChainServiceImplSpec extends Specification {
 
     def "should tamper with my 1st chain by changing previous hash"() {
         given:
-          def chain = service.myFirstChain(difficulty)
-          def aBlock = chain.get(1)
+          def chain = service.myFirstChain()
+          def aBlock = chain.find{ it.id == 2}
           aBlock.setPreviousHash("foo")
 
         when:
-          service.validateChain(chain, difficulty)
+          service.validateChain(chain)
 
         then:
           thrown UnequalCurrentHashException
@@ -67,12 +60,12 @@ class BlockChainServiceImplSpec extends Specification {
 
     def "should tamper with my 1st chain by changing hash"() {
         given:
-          def chain = service.myFirstChain(difficulty)
-          def aBlock = chain.get(1)
+          def chain = service.myFirstChain()
+          def aBlock = chain.find{ it.id == 2}
           aBlock.setHash("foo")
 
         when:
-          service.validateChain(chain, difficulty)
+          service.validateChain(chain)
 
         then:
           thrown UnequalCurrentHashException
@@ -80,12 +73,12 @@ class BlockChainServiceImplSpec extends Specification {
 
     def "should tamper with my 1st chain by changing nonce"() {
         given:
-          def chain = service.myFirstChain(difficulty)
-          def aBlock = chain.get(1)
+          def chain = service.myFirstChain()
+          def aBlock = chain.find{ it.id == 2}
           aBlock.setNonce(20)
 
         when:
-          service.validateChain(chain, difficulty)
+          service.validateChain(chain)
 
         then:
           thrown UnequalCurrentHashException
@@ -93,12 +86,12 @@ class BlockChainServiceImplSpec extends Specification {
 
     def "should tamper with my 1st chain by changing timestamp"() {
         given:
-          def chain = service.myFirstChain(difficulty)
-          def aBlock = chain.get(1)
+          def chain = service.myFirstChain()
+          def aBlock = chain.find{ it.id == 2}
           aBlock.setTimeStamp(new Date().getTime())
 
         when:
-          service.validateChain(chain, difficulty)
+          service.validateChain(chain)
 
         then:
           thrown UnequalCurrentHashException
@@ -106,12 +99,12 @@ class BlockChainServiceImplSpec extends Specification {
 
     def "should tamper with my 1st chain by changing merkleRoot"() {
         given:
-          def chain = service.myFirstChain(difficulty)
-          def aBlock = chain.get(1)
+          def chain = service.myFirstChain()
+          def aBlock = chain.find{ it.id == 2}
           aBlock.setMerkleRoot("tampering")
 
         when:
-          service.validateChain(chain, difficulty)
+          service.validateChain(chain)
 
         then:
           thrown UnequalCurrentHashException
@@ -119,12 +112,12 @@ class BlockChainServiceImplSpec extends Specification {
 
     def "should tamper with my 1st chain by trying to append a block"() {
         given:
-          def chain = service.myFirstChain(difficulty)
-          def newBlock = new Block("adding evil block")
+          def chain = service.myFirstChain()
+          def newBlock = new Block(4,"adding evil block")
           chain.add(newBlock)
 
         when:
-          service.validateChain(chain, difficulty)
+          service.validateChain(chain)
 
         then:
           thrown BrokenChainException
@@ -132,11 +125,11 @@ class BlockChainServiceImplSpec extends Specification {
 
     def "should tamper with my 1st chain by trying to remove a block"() {
         given:
-          def chain = service.myFirstChain(difficulty)
+          def chain = service.myFirstChain()
           chain.remove(1)
 
         when:
-          service.validateChain(chain, difficulty)
+          service.validateChain(chain)
 
         then:
           thrown BrokenChainException
@@ -144,12 +137,13 @@ class BlockChainServiceImplSpec extends Specification {
 
     def "should tamper with my 1st chain by trying to add an unmined block"() {
         given:
-          def chain = service.myFirstChain(difficulty)
-          def block = new Block(getLastBlock(chain).getHash())
+          def chain = service.myFirstChain()
+          def aBlock = chain.last()
+          def block = new Block(4, aBlock.getHash())
           chain.add(block)
 
         when:
-          service.validateChain(chain, difficulty)
+          service.validateChain(chain)
 
         then:
           thrown UnminedChainException
@@ -157,103 +151,29 @@ class BlockChainServiceImplSpec extends Specification {
 
     def "should add to my 1st chain by trying to add an mined block"() {
         given:
-          def chain = service.myFirstChain(difficulty)
-          def block = new Block(getLastBlock(chain).getHash())
-          block.mine(difficulty)
+          def chain = service.myFirstChain()
+          def aBlock = chain.last()
+          def block = new Block(4, aBlock.getHash())
+          block.mine(this.difficulty)
           chain.add(block)
 
         when:
-          def valid = service.validateChain(chain, difficulty)
+          def valid = service.validateChain(chain)
 
         then:
           valid
     }
 
-    private Block getLastBlock(List<Block> chain) {
-        chain.get(chain.size() - 1)
-    }
-
     def "should try mining my 1st chain"() {
         given:
-            def chain = service.myFirstChain(difficulty)
+            def chain = service.myFirstChain()
 
         when:
-            def mined = service.tryMining(chain, difficulty)
-            def valid = service.validateChain(mined, difficulty)
+            def mined = service.tryMining(chain)
+            def valid = service.validateChain(mined)
 
         then:
             mined != null && !mined.isEmpty()
             valid
-    }
-
-    def "should create a verified transaction"() {
-
-        given: "Create 2 new wallets"
-          Wallet walletA = new Wallet()
-          LOG.info("Keys - Private {} and public {}",
-              HashUtil.getStringFromKey(walletA.getPrivateKey()),
-              HashUtil.getStringFromKey(walletA.getPublicKey()))
-          Wallet walletB = new Wallet()
-          LOG.info("Keys - Private {} and public {}",
-              HashUtil.getStringFromKey(walletB.getPrivateKey()),
-              HashUtil.getStringFromKey(walletB.getPublicKey()))
-
-        and: "Create a test transaction from walletA to walletB"
-          def inputs = null
-          Transaction transaction = new Transaction(walletA.getPublicKey(), walletB.getPublicKey(),
-              5, inputs)
-          transaction.generateSignature(walletA.getPrivateKey())
-
-        when: "Verify the signature works and verify it from the public key"
-          def verified = transaction.verifySignature()
-
-        then:
-          verified
-    }
-
-    def "should NOT process a transaction w/o inputs"() {
-
-        given: "Create 2 new wallets"
-          Wallet walletA = new Wallet()
-          Wallet walletB = new Wallet()
-
-        and: "Create a test transaction from walletA to walletB"
-          def inputs = []
-          Transaction transaction = new Transaction(walletA.getPublicKey(), walletB.getPublicKey(),
-              5, inputs)
-          transaction.generateSignature(walletA.getPrivateKey())
-
-        when: "Try to process the transaction"
-          def verified = service.processTransaction(transaction)
-
-        then:
-          !verified
-    }
-
-    def "should send try to funds from walletA which does not have enough funds"() {
-
-        given: "Create 2 new wallets"
-          Wallet walletA = new Wallet()
-          Wallet walletB = new Wallet()
-
-        when: "Verify the transaction has been processed"
-          def txn = service.sendFundsFromWallet(walletA, walletB.getPublicKey(), 10.0)
-
-        then:
-          txn == null
-    }
-
-    def "should try to add null transaction to a block"() {
-
-        given:
-          def chain = service.myFirstChain(difficulty)
-          Block lastBlock = getLastBlock(chain)
-          Transaction txn = null
-
-        when: "Verify the transaction has been processed"
-          def success = service.addTransactionToBlock(txn, lastBlock)
-
-        then:
-          !success
     }
 }
