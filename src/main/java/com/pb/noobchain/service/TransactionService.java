@@ -10,8 +10,6 @@ public interface TransactionService
 {
     boolean processTransaction(Transaction transaction);
 
-    float getBalance(final Wallet wallet);
-
     Transaction sendFundsFromWallet(Wallet wallet, PublicKey recipient, float value);
 
     boolean addTransactionToBlock(Transaction transaction, Block block);

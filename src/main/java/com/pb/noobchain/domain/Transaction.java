@@ -16,13 +16,19 @@ public class Transaction {
     // Recipients address/public key.
     private PublicKey recipient;
 
+    // Planned amount to send
     public float value;
 
-    // this is to prevent anybody else from spending funds in our wallet.
+    // this cryptographic signature proves the owner of the address is the
+    // one sending this transaction and that the data hasn’t been changed.
+    // (for example: preventing a third party from changing the amount sent)
     private byte[] signature;
 
+    // References to previous transactions that prove the sender has funds to send.
     private List<TransactionInput> inputs = Lists.newArrayList();
 
+    // Shows the amount that relevant addresses received in the transaction.
+    // These outputs are referenced as inputs in new transactions
     private List<TransactionOutput> outputs = Lists.newArrayList();
 
     // Constructor:

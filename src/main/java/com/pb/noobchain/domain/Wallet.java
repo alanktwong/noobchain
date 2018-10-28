@@ -10,12 +10,14 @@ import com.pb.noobchain.service.HashUtil;
 public class Wallet {
     private String id;
 
+    // Our private key is used to sign our transactions, so that nobody can spend our noobCoins other than the owner of the private key
     private PrivateKey privateKey;
 
+    // Public key will act as our address. It’s OK to share this public key with others to receive payment.
     private PublicKey publicKey;
 
     //only UTXOs owned by this wallet.
-    public Map<String,TransactionOutput> unspentTransactionOutputs = Maps.newHashMap();
+    private Map<String,TransactionOutput> unspentTransactionOutputs = Maps.newHashMap();
 
     public Wallet(final String id){
         this.id = id;

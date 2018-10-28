@@ -20,10 +20,10 @@ public class Block
 
     private String previousHash;
 
-    public String merkleRoot;
+    private String merkleRoot;
 
     //our data will be a simple message.
-    public List<Transaction> transactions = new ArrayList<>();
+    private List<Transaction> transactions = new ArrayList<>();
 
     //as number of milliseconds since 1/1/1970.
     private long timeStamp;
