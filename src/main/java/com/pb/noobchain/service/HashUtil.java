@@ -87,7 +87,7 @@ public class HashUtil
             count = treeLayer.size();
             previousTreeLayer = treeLayer;
         }
-        String merkleRoot = (treeLayer.size() == 1) ? treeLayer.get(0) : "";
+        String merkleRoot = (treeLayer.size() == 1) ? treeLayer.get(0) : StringUtils.EMPTY;
         LOG.debug("Computed merkle root: {}", merkleRoot);
         return merkleRoot;
     }
