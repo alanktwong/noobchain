@@ -18,7 +18,7 @@ public interface TransactionDomainService
 
     boolean processTransaction(Transaction transaction);
 
-    Transaction sendFundsToWallet(Wallet wallet, PublicKey _recipient, float value);
+    Transaction sendFundsFromWallet(Wallet wallet, PublicKey _recipient, float value);
 
     boolean addTransactionToBlock(Transaction transaction, Block block);
 }

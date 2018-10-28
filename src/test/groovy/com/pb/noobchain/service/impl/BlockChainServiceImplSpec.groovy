@@ -7,12 +7,9 @@ import com.pb.noobchain.exceptions.BrokenChainException
 import com.pb.noobchain.exceptions.UnequalCurrentHashException
 import com.pb.noobchain.exceptions.UnminedChainException
 import com.pb.noobchain.service.HashUtil
-import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import spock.lang.Specification
-
-import java.security.Security
 
 class BlockChainServiceImplSpec extends Specification {
 
@@ -148,7 +145,7 @@ class BlockChainServiceImplSpec extends Specification {
     def "should tamper with my 1st chain by trying to add an unmined block"() {
         given:
           def chain = service.myFirstChain(difficulty)
-          def block = new Block(chain.get(2).getHash())
+          def block = new Block(getLastBlock(chain).getHash())
           chain.add(block)
 
         when:
@@ -161,7 +158,7 @@ class BlockChainServiceImplSpec extends Specification {
     def "should add to my 1st chain by trying to add an mined block"() {
         given:
           def chain = service.myFirstChain(difficulty)
-          def block = new Block(chain.get(2).getHash())
+          def block = new Block(getLastBlock(chain).getHash())
           block.mine(difficulty)
           chain.add(block)
 
@@ -170,6 +167,10 @@ class BlockChainServiceImplSpec extends Specification {
 
         then:
           valid
+    }
+
+    private Block getLastBlock(List<Block> chain) {
+        chain.get(chain.size() - 1)
     }
 
     def "should try mining my 1st chain"() {
@@ -185,13 +186,9 @@ class BlockChainServiceImplSpec extends Specification {
             valid
     }
 
-
     def "should create a verified transaction"() {
 
-        given: "set up Bouncy Castle as security provider"
-          Security.addProvider(new BouncyCastleProvider())
-
-        and: "Create 2 new wallets"
+        given: "Create 2 new wallets"
           Wallet walletA = new Wallet()
           LOG.info("Keys - Private {} and public {}",
               HashUtil.getStringFromKey(walletA.getPrivateKey()),
@@ -214,4 +211,49 @@ class BlockChainServiceImplSpec extends Specification {
           verified
     }
 
+    def "should NOT process a transaction w/o inputs"() {
+
+        given: "Create 2 new wallets"
+          Wallet walletA = new Wallet()
+          Wallet walletB = new Wallet()
+
+        and: "Create a test transaction from walletA to walletB"
+          def inputs = []
+          Transaction transaction = new Transaction(walletA.getPublicKey(), walletB.getPublicKey(),
+              5, inputs)
+          transaction.generateSignature(walletA.getPrivateKey())
+
+        when: "Try to process the transaction"
+          def verified = service.processTransaction(transaction)
+
+        then:
+          !verified
+    }
+
+    def "should send try to funds from walletA which does not have enough funds"() {
+
+        given: "Create 2 new wallets"
+          Wallet walletA = new Wallet()
+          Wallet walletB = new Wallet()
+
+        when: "Verify the transaction has been processed"
+          def txn = service.sendFundsFromWallet(walletA, walletB.getPublicKey(), 10.0)
+
+        then:
+          txn == null
+    }
+
+    def "should try to add null transaction to a block"() {
+
+        given:
+          def chain = service.myFirstChain(difficulty)
+          Block lastBlock = getLastBlock(chain)
+          Transaction txn = null
+
+        when: "Verify the transaction has been processed"
+          def success = service.addTransactionToBlock(txn, lastBlock)
+
+        then:
+          !success
+    }
 }

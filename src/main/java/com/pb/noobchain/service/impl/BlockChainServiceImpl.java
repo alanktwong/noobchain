@@ -1,11 +1,14 @@
 package com.pb.noobchain.service.impl;
 
+import java.security.Provider;
 import java.security.PublicKey;
+import java.security.Security;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -31,11 +34,25 @@ public class BlockChainServiceImpl implements BlockChainService
 
     private static final String PREVIOUS_HASH_OF_GENESIS = "0";
 
+    private Provider provider = new BouncyCastleProvider();
+
     private float minimumTransaction = 0.00f;
+
+    public void setProvider(final Provider provider)
+    {
+        if (provider != null) {
+            Security.addProvider(provider);
+        }
+        this.provider = provider;
+    }
 
     public void setMinimumTransaction(final float minimumTransaction)
     {
         this.minimumTransaction = minimumTransaction;
+    }
+
+    public BlockChainServiceImpl() {
+        this.setProvider(new BouncyCastleProvider());
     }
 
     @Override
@@ -173,9 +190,9 @@ public class BlockChainServiceImpl implements BlockChainService
     }
 
     @Override
-    public Transaction sendFundsToWallet(Wallet wallet, PublicKey _recipient, float value) {
+    public Transaction sendFundsFromWallet(Wallet fromWallet, PublicKey _recipient, float value) {
         //gather balance and check funds.
-        if (wallet.getBalance(this.unspentTxnOutputs) < value) {
+        if (fromWallet.getBalance(this.unspentTxnOutputs) < value) {
             log.error("#Not Enough funds to send transaction. Transaction Discarded.");
             return null;
         }
@@ -184,7 +201,7 @@ public class BlockChainServiceImpl implements BlockChainService
 
         float total = 0;
 
-        final Map<String, TransactionOutput> utxosOfWallet = wallet.getUnspentTransactionOutputs();
+        final Map<String, TransactionOutput> utxosOfWallet = fromWallet.getUnspentTransactionOutputs();
         for (Map.Entry<String, TransactionOutput> item: utxosOfWallet.entrySet()){
             TransactionOutput UTXO = item.getValue();
             total += UTXO.getValue();
@@ -194,13 +211,13 @@ public class BlockChainServiceImpl implements BlockChainService
             }
         }
 
-        Transaction newTransaction = new Transaction(wallet.getPublicKey(), _recipient , value, inputs);
-        newTransaction.generateSignature(wallet.getPrivateKey());
+        Transaction newTransaction = new Transaction(fromWallet.getPublicKey(), _recipient , value, inputs);
+        newTransaction.generateSignature(fromWallet.getPrivateKey());
 
         for (TransactionInput input: inputs) {
             utxosOfWallet.remove(input.getTransactionOutputId());
         }
-        wallet.setUnspentTransactionOutputs(utxosOfWallet);
+        fromWallet.setUnspentTransactionOutputs(utxosOfWallet);
 
         return newTransaction;
     }
