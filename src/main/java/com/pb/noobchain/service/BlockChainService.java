@@ -13,4 +13,6 @@ public interface BlockChainService
     boolean validateChain(final List<Block> blockChain);
 
     List<Block> tryMining(final List<Block> blockChain);
+
+    boolean mineBlockAndAddToChain(Block newBlock, List<Block> blockChain);
 }

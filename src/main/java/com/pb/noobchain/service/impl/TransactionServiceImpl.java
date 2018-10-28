@@ -31,6 +31,8 @@ public class TransactionServiceImpl implements TransactionService
 
     private float minimumTransaction = 0.00f;
 
+    private static long SEQUENCE = 0;
+
     public void setMinimumTransaction(final float minimumTransaction)
     {
         this.minimumTransaction = minimumTransaction;
@@ -47,6 +49,17 @@ public class TransactionServiceImpl implements TransactionService
     public TransactionServiceImpl(TransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
         this.setProvider(provider);
+    }
+
+    // This calculates the transaction hash (which will be used as its Id)
+    private String calculateHash(Transaction txn) {
+        //increase the sequence to avoid 2 identical transactions having the same hash
+        SEQUENCE++;
+        final String input = HashUtil.getStringFromKey(txn.getSender()) +
+            HashUtil.getStringFromKey(txn.getRecipient()) +
+            Float.toString(txn.getValue()) +
+            SEQUENCE;
+        return HashUtil.applySha256(input);
     }
 
     @Override
@@ -67,16 +80,19 @@ public class TransactionServiceImpl implements TransactionService
         transaction.setInputs(inputs);
 
         //check if transaction is valid:
-        if (transaction.getInputsValue() < this.minimumTransaction) {
-            log.error("#Transaction Inputs to small: {}", transaction.getInputsValue());
+        final float inputsValue = transaction.getInputsValue();
+        if (inputsValue < this.minimumTransaction) {
+            log.error("#Transaction Inputs too small: {}", inputsValue);
             return false;
         }
 
         //generate transaction outputs:
 
         //get value of inputs then the left over change:
-        float leftOver = transaction.getInputsValue() - transaction.getValue();
-        transaction.setTransactionId(transaction.calculateHash());
+        float leftOver = inputsValue - transaction.getValue();
+
+        final String hash = calculateHash(transaction);
+        transaction.setTransactionId(hash);
 
         List<TransactionOutput> outputs = transaction.getOutputs();
         sendValueToRecipient(transaction, outputs);
@@ -107,9 +123,25 @@ public class TransactionServiceImpl implements TransactionService
     }
 
     @Override
+    public float getBalance(final Wallet wallet) {
+        float total = 0;
+        Map<String, TransactionOutput> utxos = transactionRepository.getUnspentTxnOutputs();
+        for (Map.Entry<String, TransactionOutput> item: utxos.entrySet()) {
+            TransactionOutput unspentTransactionOutput = item.getValue();
+            //if output belongs to me ( if coins belong to me )
+            if (unspentTransactionOutput.isMine(wallet.getPublicKey())) {
+                //add it to our list of unspent transactions.
+                wallet.getUnspentTransactionOutputs().put(unspentTransactionOutput.getId(), unspentTransactionOutput);
+                total += unspentTransactionOutput.getValue();
+            }
+        }
+        return total;
+    }
+
+    @Override
     public Transaction sendFundsFromWallet(Wallet fromWallet, PublicKey recipient, float value) {
         //gather balance and check funds.
-        if (fromWallet.getBalance(transactionRepository.getUnspentTxnOutputs()) < value) {
+        if (getBalance(fromWallet) < value) {
             log.error("#Not Enough funds to send transaction. Transaction Discarded.");
             return null;
         }
@@ -146,7 +178,6 @@ public class TransactionServiceImpl implements TransactionService
             return false;
         }
         if (!HashUtil.PREVIOUS_HASH_OF_GENESIS.equals(block.getPreviousHash())) {
-
             if (processTransaction(transaction)) {
                 log.error("Transaction failed to process. Discarded.");
                 return false;

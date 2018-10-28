@@ -2,51 +2,37 @@ package com.pb.noobchain.domain;
 
 
 import java.security.*;
-import java.security.spec.ECGenParameterSpec;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
+import com.pb.noobchain.service.HashUtil;
 
 public class Wallet {
+    private String id;
+
     private PrivateKey privateKey;
 
     private PublicKey publicKey;
 
     //only UTXOs owned by this wallet.
-    public Map<String,TransactionOutput> unspentTransactionOutputs = Maps.newHashMap();
+    private Map<String,TransactionOutput> unspentTransactionOutputs = Maps.newHashMap();
 
-    public Wallet(){
-        generateKeyPair(this);
+    public Wallet(String id){
+        this.id = id;
+        HashUtil.generateKeyPair().ifPresent(kp -> {
+            this.setPublicKey(kp.getPublic());
+            this.setPrivateKey(kp.getPrivate());
+        });
     }
 
-    public void generateKeyPair(Wallet wallet) {
-        try {
-            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("ECDSA","BC");
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-            ECGenParameterSpec ecSpec = new ECGenParameterSpec("prime192v1");
-            // Initialize the key generator and generate a KeyPair
-            keyGen.initialize(ecSpec, random);   //256 bytes provides an acceptable security level
-            KeyPair keyPair = keyGen.generateKeyPair();
-            // Set the public and private keys from the keyPair
-            wallet.setPrivateKey(keyPair.getPrivate());
-            wallet.setPublicKey(keyPair.getPublic());
-        } catch(Exception e) {
-            throw new IllegalArgumentException(e);
-        }
+    public String getId()
+    {
+        return id;
     }
 
-    public float getBalance(Map<String,TransactionOutput> utxos) {
-        float total = 0;
-        for (Map.Entry<String, TransactionOutput> item: utxos.entrySet()) {
-            TransactionOutput unspentTransactionOutput = item.getValue();
-            //if output belongs to me ( if coins belong to me )
-            if (unspentTransactionOutput.isMine(publicKey)) {
-                //add it to our list of unspent transactions.
-                unspentTransactionOutputs.put(unspentTransactionOutput.getId(), unspentTransactionOutput);
-                total += unspentTransactionOutput.getValue();
-            }
-        }
-        return total;
+    public void setId(final String id)
+    {
+        this.id = id;
     }
 
     public Map<String, TransactionOutput> getUnspentTransactionOutputs()
