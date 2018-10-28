@@ -203,6 +203,11 @@ public class BlockChainServiceImpl implements BlockChainService
     }
 
     @Override
+    public boolean addTransactionToBlock(Transaction transaction, Block block) {
+        return true;
+    }
+
+    @Override
     public TransactionOutput getUnspentTransactionOutput(final String transactionOutputId) {
         return unspentTxnOutputs.get(transactionOutputId);
     }
