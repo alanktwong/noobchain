@@ -164,7 +164,7 @@ public class TransactionServiceImpl implements TransactionService
     }
 
     // This calculates the transaction hash (which will be used as its Id)
-    public String calculateHash(Transaction txn) {
+    private String calculateHash(Transaction txn) {
         //increase the sequence to avoid 2 identical transactions having the same hash
         SEQUENCE++;
         final String input = HashUtil.getStringFromKey(txn.getSender()) +
@@ -172,5 +172,20 @@ public class TransactionServiceImpl implements TransactionService
             Float.toString(txn.getValue()) +
             SEQUENCE;
         return HashUtil.applySha256(input);
+    }
+
+    public float getBalance(Wallet wallet) {
+        float total = 0;
+        Map<String,TransactionOutput> utxos = transactionRepository.getUnspentTxnOutputs();
+        for (Map.Entry<String, TransactionOutput> item: utxos.entrySet()) {
+            TransactionOutput unspentTransactionOutput = item.getValue();
+            //if output belongs to me ( if coins belong to me )
+            if (unspentTransactionOutput.isMine(wallet.getPublicKey())) {
+                //add it to our list of unspent transactions.
+                wallet.getUnspentTransactionOutputs().put(unspentTransactionOutput.getId(), unspentTransactionOutput);
+                total += unspentTransactionOutput.getValue();
+            }
+        }
+        return total;
     }
 }

@@ -13,4 +13,6 @@ public interface TransactionService
     Transaction sendFundsFromWallet(Wallet wallet, PublicKey recipient, float value);
 
     boolean addTransactionToBlock(Transaction transaction, Block block);
+
+    float getBalance(Wallet wallet);
 }

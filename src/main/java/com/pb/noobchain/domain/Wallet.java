@@ -26,20 +26,6 @@ public class Wallet {
         });
     }
 
-    public float getBalance(Map<String,TransactionOutput> utxos) {
-        float total = 0;
-        for (Map.Entry<String, TransactionOutput> item: utxos.entrySet()) {
-            TransactionOutput unspentTransactionOutput = item.getValue();
-            //if output belongs to me ( if coins belong to me )
-            if (unspentTransactionOutput.isMine(publicKey)) {
-                //add it to our list of unspent transactions.
-                unspentTransactionOutputs.put(unspentTransactionOutput.getId(), unspentTransactionOutput);
-                total += unspentTransactionOutput.getValue();
-            }
-        }
-        return total;
-    }
-
     public String getId()
     {
         return id;
