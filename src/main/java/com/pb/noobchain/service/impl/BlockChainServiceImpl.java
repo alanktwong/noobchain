@@ -103,4 +103,13 @@ public class BlockChainServiceImpl implements BlockChainService
         }
         return blockChain;
     }
+
+    @Override
+    public boolean mineBlockAndAddToChain(final Block newBlock, final List<Block> blockChain) {
+        boolean result = newBlock.mine(difficulty);
+        if (result) {
+            result &= blockChain.add(newBlock);
+        }
+        return result;
+    }
 }
