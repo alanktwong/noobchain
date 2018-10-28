@@ -207,6 +207,21 @@ public class BlockChainServiceImpl implements BlockChainService
 
     @Override
     public boolean addTransactionToBlock(Transaction transaction, Block block) {
+        // process transaction and check if valid, unless block is genesis block then ignore.
+        if (transaction == null) {
+            return false;
+        }
+        if (!PREVIOUS_HASH_OF_GENESIS.equals(block.getPreviousHash())) {
+
+            if (processTransaction(transaction)) {
+                log.error("Transaction failed to process. Discarded.");
+                return false;
+            }
+        }
+        final List<Transaction> transactions = block.getTransactions();
+        transactions.add(transaction);
+        block.setTransactions(transactions);
+        log.info("Transaction Successfully added to Block");
         return true;
     }
 
