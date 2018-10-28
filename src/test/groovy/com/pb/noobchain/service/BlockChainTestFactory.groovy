@@ -23,13 +23,9 @@ class BlockChainTestFactory {
       Wallet walletA = new Wallet("A")
       Wallet walletB = new Wallet("B")
 
-      LOG.info("Create genesis transaction, which sends 100 NoobCoin to wallet A")
-      Transaction genesisTransaction = createGenesis(coinBase, walletA, 100f)
+      Transaction genesisTransaction = createGenesisTxn(coinBase, walletA, 100f)
 
-      LOG.info("Creating and mining Genesis block... ")
-      Block genesis = new Block("genesis", HashUtil.PREVIOUS_HASH_OF_GENESIS)
-      transactionService.addTransactionToBlock(genesisTransaction, genesis)
-      blockChainService.mineBlockAndAddToChain(genesis, blockChain)
+      Block genesis = createGenesisBlock(genesisTransaction, blockChain)
 
       LOG.info("Wallet A is trying to send funds (40) to Wallet B ...")
       Block block1 = new Block("1", genesis.getHash())
@@ -54,17 +50,30 @@ class BlockChainTestFactory {
         LOG.info("Recipient [{}] final balance: {}", recipient.getId(), transactionService.getBalance(recipient))
     }
 
-    Transaction createGenesis(Wallet coinbase, Wallet sender, float value = 100f) {
-        Transaction genesisTransaction = new Transaction(coinbase.publicKey, sender.getPublicKey(), value, null)
+    Block createGenesisBlock(Transaction genesisTransaction, List<Block> blockChain) {
+        LOG.info("Creating and mining Genesis block... ")
+        Block genesis = new Block("genesis", HashUtil.PREVIOUS_HASH_OF_GENESIS)
+        transactionService.addTransactionToBlock(genesisTransaction, genesis)
+        blockChainService.mineBlockAndAddToChain(genesis, blockChain)
+        genesis
+    }
+
+    Transaction createGenesisTxn(Wallet sender, Wallet recipient, float value = 100f) {
+        LOG.info("Create genesis transaction, which sends {} NoobCoin from wallet {} to wallet {}",
+            value,
+            sender.getId(),
+            recipient.getId())
+
+        Transaction genesisTransaction = new Transaction(sender.getPublicKey(), recipient.getPublicKey(), value, null)
         //manually sign the genesis transaction
-        genesisTransaction.generateSignature(coinbase.getPrivateKey())
+        genesisTransaction.generateSignature(sender.getPrivateKey())
         //manually set the transaction id
         genesisTransaction.transactionId = HashUtil.PREVIOUS_HASH_OF_GENESIS
         //manually add the Transactions Output
         def output = new TransactionOutput(genesisTransaction.getRecipient(), genesisTransaction.getValue(), genesisTransaction.getTransactionId())
         genesisTransaction.outputs.add(output)
 
-        //its important to store our first transaction in the UTXOs list.
+        //its important to store our 1st transaction in the UTXOs list.
         transactionRepository.addTransactionOutput(output)
         genesisTransaction
     }

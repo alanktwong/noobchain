@@ -32,7 +32,6 @@ class TransactionServiceImplSpec extends Specification {
     }
 
     def "should create a verified transaction"() {
-
         given: "Create 2 new wallets"
           Wallet walletA = new Wallet("A")
           LOG.info("Keys - Private {} and public {}",
@@ -57,7 +56,6 @@ class TransactionServiceImplSpec extends Specification {
     }
 
     def "should process a transaction w/empty inputs"() {
-
         given: "Create 2 new wallets"
           Wallet walletA = new Wallet("A")
           Wallet walletB = new Wallet("B")
@@ -76,7 +74,6 @@ class TransactionServiceImplSpec extends Specification {
     }
 
     def "should send try to funds from walletA which does not have enough funds"() {
-
         given: "Create 2 new wallets"
           Wallet walletA = new Wallet("A")
           Wallet walletB = new Wallet("B")
@@ -89,14 +86,21 @@ class TransactionServiceImplSpec extends Specification {
     }
 
     def "should try to add null transaction to a block"() {
-
         given:
-          def chain = blockChainService.myFirstChain()
-          Block lastBlock = chain.last()
+          Wallet coinBase = new Wallet("coinBase")
+          Wallet walletA = new Wallet("A")
+
+        and:
+          def blockChain = []
+          def factory = new BlockChainTestFactory(transactionService: service,
+              blockChainService: blockChainService,
+              transactionRepository: repo)
+          def genesisTxn = factory.createGenesisTxn(coinBase, walletA, 100f)
+          def genesisBlock = factory.createGenesisBlock(genesisTxn, blockChain)
           Transaction txn = null
 
         when: "Verify the transaction has been processed"
-          def success = service.addTransactionToBlock(txn, lastBlock)
+          def success = service.addTransactionToBlock(txn, genesisBlock)
 
         then:
           !success
@@ -115,6 +119,4 @@ class TransactionServiceImplSpec extends Specification {
         then:
           valid
     }
-
-
 }
