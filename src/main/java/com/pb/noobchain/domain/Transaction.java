@@ -3,10 +3,15 @@ package com.pb.noobchain.domain;
 import java.security.*;
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Lists;
 import com.pb.noobchain.service.HashUtil;
 
 public class Transaction {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Transaction.class);
 
     // this is also the hash of the transaction.
     private String transactionId;
@@ -38,7 +43,7 @@ public class Transaction {
     }
 
     // This calculates the transaction hash (which will be used as its Id)
-    private String calculateHash() {
+    public String calculateHash() {
         //increase the sequence to avoid 2 identical transactions having the same hash
         sequence++;
         final String input = HashUtil.getStringFromKey(getSender()) +
@@ -62,6 +67,28 @@ public class Transaction {
     public boolean verifySignature() {
         String data = getData(this);
         return HashUtil.verifyECDSASig(getSender(), data, getSignature());
+    }
+
+    //returns sum of inputs(UTXOs) values
+    public float getInputsValue() {
+        float total = 0;
+        for (TransactionInput input : getInputs()) {
+            //if Transaction can't be found skip it
+            if (input.getUnspentTransactionOutput() == null) {
+                continue;
+            }
+            total += input.getUnspentTransactionOutput().getValue();
+        }
+        return total;
+    }
+
+    //returns sum of outputs:
+    public float getOutputsValue() {
+        float total = 0;
+        for (TransactionOutput output : getOutputs()) {
+            total += output.getValue();
+        }
+        return total;
     }
 
     public String getTransactionId()

@@ -14,4 +14,7 @@ public interface TransactionDomainService
     TransactionOutput addTransactionOutput(final TransactionOutput txnOutput);
 
     TransactionOutput removeTransactionOutput(final TransactionInput txnInput);
+
+    boolean processTransaction(Transaction transaction);
+
 }

@@ -110,6 +110,64 @@ public class BlockChainServiceImpl implements BlockChainService
         }
         return blockChain;
     }
+
+    @Override
+    public boolean processTransaction(Transaction transaction) {
+
+        if (!transaction.verifySignature()) {
+            log.error("#Transaction Signature failed to verify");
+            return false;
+        }
+
+        //gather transaction inputs (Make sure they are unspent):
+        final List<TransactionInput> inputs = transaction.getInputs().stream()
+            .map(input -> {
+                TransactionOutput unspentTxnOutput = getUnspentTransactionOutput(input.getTransactionOutputId());
+                input.setUnspentTransactionOutput(unspentTxnOutput);
+                return input;
+            }).collect(Collectors.toList());
+        transaction.setInputs(inputs);
+
+        //check if transaction is valid:
+        if (transaction.getInputsValue() < this.minimumTransaction) {
+            log.error("#Transaction Inputs to small: {}", transaction.getInputsValue());
+            return false;
+        }
+
+        //generate transaction outputs:
+
+        //get value of inputs then the left over change:
+        float leftOver = transaction.getInputsValue() - transaction.getValue();
+        transaction.setTransactionId(transaction.calculateHash());
+
+        List<TransactionOutput> outputs = transaction.getOutputs();
+        sendValueToRecipient(transaction, outputs);
+        sendLeftOverChangeToSender(transaction, leftOver, outputs);
+        transaction.setOutputs(outputs);
+
+        //add outputs to Unspent list
+        transaction.getOutputs().forEach(this::addTransactionOutput);
+
+        //remove transaction inputs from UTXO lists as spent:
+        transaction.getInputs().stream()
+            .filter(i -> i.getUnspentTransactionOutput() != null)
+            .forEach(this::removeTransactionOutput);
+
+        return true;
+    }
+
+    private void sendLeftOverChangeToSender(final Transaction transaction, final float leftOver, final List<TransactionOutput> outputs)
+    {
+        final TransactionOutput output = new TransactionOutput(transaction.getSender(), leftOver, transaction.getTransactionId());
+        outputs.add(output);
+    }
+
+    private void sendValueToRecipient(final Transaction transaction, final List<TransactionOutput> outputs)
+    {
+        TransactionOutput output = new TransactionOutput(transaction.getRecipient(), transaction.getValue(), transaction.getTransactionId());
+        outputs.add(output);
+    }
+
     @Override
     public TransactionOutput getUnspentTransactionOutput(final String transactionOutputId) {
         return unspentTxnOutputs.get(transactionOutputId);
