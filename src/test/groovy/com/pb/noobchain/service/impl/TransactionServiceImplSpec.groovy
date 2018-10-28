@@ -32,11 +32,11 @@ class TransactionServiceImplSpec extends Specification {
     def "should create a verified transaction"() {
 
         given: "Create 2 new wallets"
-          Wallet walletA = new Wallet()
+          Wallet walletA = new Wallet("A")
           LOG.info("Keys - Private {} and public {}",
               HashUtil.getStringFromKey(walletA.getPrivateKey()),
               HashUtil.getStringFromKey(walletA.getPublicKey()))
-          Wallet walletB = new Wallet()
+          Wallet walletB = new Wallet("B")
           LOG.info("Keys - Private {} and public {}",
               HashUtil.getStringFromKey(walletB.getPrivateKey()),
               HashUtil.getStringFromKey(walletB.getPublicKey()))
@@ -57,8 +57,8 @@ class TransactionServiceImplSpec extends Specification {
     def "should NOT process a transaction w/o inputs"() {
 
         given: "Create 2 new wallets"
-          Wallet walletA = new Wallet()
-          Wallet walletB = new Wallet()
+          Wallet walletA = new Wallet("A")
+          Wallet walletB = new Wallet("B")
 
         and: "Create a test transaction from walletA to walletB"
           def inputs = []
@@ -76,8 +76,8 @@ class TransactionServiceImplSpec extends Specification {
     def "should send try to funds from walletA which does not have enough funds"() {
 
         given: "Create 2 new wallets"
-          Wallet walletA = new Wallet()
-          Wallet walletB = new Wallet()
+          Wallet walletA = new Wallet("A")
+          Wallet walletB = new Wallet("B")
 
         when: "Verify the transaction has been processed"
           def txn = service.sendFundsFromWallet(walletA, walletB.getPublicKey(), 10.0)

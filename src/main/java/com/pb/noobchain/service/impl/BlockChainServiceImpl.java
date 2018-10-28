@@ -33,20 +33,20 @@ public class BlockChainServiceImpl implements BlockChainService
         Block genesisBlock = createGenesis(this.difficulty);
         blockChain.add(genesisBlock);
 
-        Block block2 = addBlock(blockChain, 2, genesisBlock, this.difficulty);
-        addBlock(blockChain, 3, block2, this.difficulty);
+        Block block2 = addBlock(blockChain, "2", genesisBlock, this.difficulty);
+        addBlock(blockChain, "3", block2, this.difficulty);
 
         return blockChain;
     }
 
     private Block createGenesis(int difficulty) {
-        Block genesisBlock = new Block(1, HashUtil.PREVIOUS_HASH_OF_GENESIS);
+        Block genesisBlock = new Block("genesis", HashUtil.PREVIOUS_HASH_OF_GENESIS);
         log.info("Hash for genesis block : {}", genesisBlock.getHash());
         genesisBlock.mine(difficulty);
         return genesisBlock;
     }
 
-    private Block addBlock(List<Block> blockChain, long id, Block previous, int difficulty) {
+    private Block addBlock(List<Block> blockChain, String id, Block previous, int difficulty) {
         Block block = new Block(id, previous.getHash());
         log.info("Hash for block {} : {}", block.getId(), block.getHash());
         block.mine(difficulty);

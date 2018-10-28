@@ -14,7 +14,7 @@ public class Block
 {
     private static final Logger log = LoggerFactory.getLogger(Block.class);
 
-    private long id;
+    private String id;
 
     private String hash;
 
@@ -33,7 +33,7 @@ public class Block
     private boolean mined;
 
     //Block Constructor.
-    public Block(long id, String previousHash) {
+    public Block(String id, String previousHash) {
         this.id = id;
         this.previousHash = previousHash;
         this.timeStamp = new Date().getTime();
@@ -77,12 +77,12 @@ public class Block
        return mineImpl(this, difficulty);
     }
 
-    public long getId()
+    public String getId()
     {
         return id;
     }
 
-    public void setId(final long id)
+    public void setId(final String id)
     {
         this.id = id;
     }

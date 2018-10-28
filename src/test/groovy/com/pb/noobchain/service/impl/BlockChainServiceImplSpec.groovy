@@ -48,7 +48,7 @@ class BlockChainServiceImplSpec extends Specification {
     def "should tamper with my 1st chain by changing previous hash"() {
         given:
           def chain = service.myFirstChain()
-          def aBlock = chain.find{ it.id == 2}
+          def aBlock = chain.find{ it.id == "2"}
           aBlock.setPreviousHash("foo")
 
         when:
@@ -61,7 +61,7 @@ class BlockChainServiceImplSpec extends Specification {
     def "should tamper with my 1st chain by changing hash"() {
         given:
           def chain = service.myFirstChain()
-          def aBlock = chain.find{ it.id == 2}
+          def aBlock = chain.find{ it.id == "2"}
           aBlock.setHash("foo")
 
         when:
@@ -74,7 +74,7 @@ class BlockChainServiceImplSpec extends Specification {
     def "should tamper with my 1st chain by changing nonce"() {
         given:
           def chain = service.myFirstChain()
-          def aBlock = chain.find{ it.id == 2}
+          def aBlock = chain.find{ it.id == "2"}
           aBlock.setNonce(20)
 
         when:
@@ -87,7 +87,7 @@ class BlockChainServiceImplSpec extends Specification {
     def "should tamper with my 1st chain by changing timestamp"() {
         given:
           def chain = service.myFirstChain()
-          def aBlock = chain.find{ it.id == 2}
+          def aBlock = chain.find{ it.id == "2"}
           aBlock.setTimeStamp(new Date().getTime())
 
         when:
@@ -100,7 +100,7 @@ class BlockChainServiceImplSpec extends Specification {
     def "should tamper with my 1st chain by changing merkleRoot"() {
         given:
           def chain = service.myFirstChain()
-          def aBlock = chain.find{ it.id == 2}
+          def aBlock = chain.find{ it.id == "2"}
           aBlock.setMerkleRoot("tampering")
 
         when:
@@ -113,7 +113,7 @@ class BlockChainServiceImplSpec extends Specification {
     def "should tamper with my 1st chain by trying to append a block"() {
         given:
           def chain = service.myFirstChain()
-          def newBlock = new Block(4,"adding evil block")
+          def newBlock = new Block("4","adding evil block")
           chain.add(newBlock)
 
         when:
@@ -139,7 +139,7 @@ class BlockChainServiceImplSpec extends Specification {
         given:
           def chain = service.myFirstChain()
           def aBlock = chain.last()
-          def block = new Block(4, aBlock.getHash())
+          def block = new Block("4",aBlock.getHash())
           chain.add(block)
 
         when:
@@ -153,7 +153,7 @@ class BlockChainServiceImplSpec extends Specification {
         given:
           def chain = service.myFirstChain()
           def aBlock = chain.last()
-          def block = new Block(4, aBlock.getHash())
+          def block = new Block("4",aBlock.getHash())
           block.mine(this.difficulty)
           chain.add(block)
 

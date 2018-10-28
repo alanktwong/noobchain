@@ -1,12 +1,17 @@
 package com.pb.noobchain.service;
 
 import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.Signature;
+import java.security.spec.ECGenParameterSpec;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
@@ -15,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.pb.noobchain.domain.Transaction;
+import com.pb.noobchain.domain.Wallet;
 
 public class HashUtil
 {
@@ -98,4 +104,20 @@ public class HashUtil
     {
         return new String(new char[difficulty]).replace('\0', '0');
     }
+
+    public static Optional<KeyPair> generateKeyPair() {
+        KeyPair keyPair = null;
+        try {
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("ECDSA","BC");
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+            ECGenParameterSpec ecSpec = new ECGenParameterSpec("prime192v1");
+            // Initialize the key generator and generate a KeyPair
+            keyGen.initialize(ecSpec, random);   //256 bytes provides an acceptable security level
+            keyPair = keyGen.generateKeyPair();
+        } catch(Exception e) {
+            LOG.error("Failed to generate", e);
+        }
+        return Optional.ofNullable(keyPair);
+    }
+
 }
