@@ -142,14 +142,4 @@ public class Transaction {
     {
         this.outputs = outputs;
     }
-
-    public static int getSequence()
-    {
-        return sequence;
-    }
-
-    public static void setSequence(final int sequence)
-    {
-        Transaction.sequence = sequence;
-    }
 }
