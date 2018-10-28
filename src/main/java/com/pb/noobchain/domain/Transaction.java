@@ -26,25 +26,12 @@ public class Transaction {
 
     private List<TransactionOutput> outputs = Lists.newArrayList();
 
-    // a rough count of how many transactions have been generated.
-    private static int sequence = 0;
-
     // Constructor:
     public Transaction(PublicKey from, PublicKey to, float value,  List<TransactionInput> inputs) {
         this.setSender(from);
         this.setRecipient(to);
         this.setValue(value);
         this.setInputs(inputs);
-    }
-
-    // This calculates the transaction hash (which will be used as its Id)
-    public String calculateHash() {
-        //increase the sequence to avoid 2 identical transactions having the same hash
-        sequence++;
-        final String input = HashUtil.getStringFromKey(getSender()) +
-            HashUtil.getStringFromKey(getRecipient()) +
-            Float.toString(getValue()) + sequence;
-        return HashUtil.applySha256(input);
     }
 
     private String getData(Transaction txn)

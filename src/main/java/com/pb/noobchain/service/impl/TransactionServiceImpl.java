@@ -23,6 +23,9 @@ import com.pb.noobchain.service.TransactionService;
 
 public class TransactionServiceImpl implements TransactionService
 {
+    // a rough count of how many transactions have been generated.
+    private static int SEQUENCE = 0;
+
     private static final Logger log = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
     private TransactionRepository transactionRepository;
@@ -76,7 +79,8 @@ public class TransactionServiceImpl implements TransactionService
 
         //get value of inputs then the left over change:
         float leftOver = transaction.getInputsValue() - transaction.getValue();
-        transaction.setTransactionId(transaction.calculateHash());
+        final String hash = calculateHash(transaction);
+        transaction.setTransactionId(hash);
 
         List<TransactionOutput> outputs = transaction.getOutputs();
         sendValueToRecipient(transaction, outputs);
@@ -157,5 +161,16 @@ public class TransactionServiceImpl implements TransactionService
         block.setTransactions(transactions);
         log.info("Transaction Successfully added to Block");
         return true;
+    }
+
+    // This calculates the transaction hash (which will be used as its Id)
+    public String calculateHash(Transaction txn) {
+        //increase the sequence to avoid 2 identical transactions having the same hash
+        SEQUENCE++;
+        final String input = HashUtil.getStringFromKey(txn.getSender()) +
+            HashUtil.getStringFromKey(txn.getRecipient()) +
+            Float.toString(txn.getValue()) +
+            SEQUENCE;
+        return HashUtil.applySha256(input);
     }
 }
