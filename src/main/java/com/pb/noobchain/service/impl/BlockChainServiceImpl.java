@@ -1,8 +1,10 @@
 package com.pb.noobchain.service.impl;
 
+import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,6 +170,38 @@ public class BlockChainServiceImpl implements BlockChainService
         outputs.add(output);
     }
 
+    public Transaction sendFundsToWallet(Wallet wallet, PublicKey _recipient, float value) {
+        //gather balance and check funds.
+        if (wallet.getBalance(this.unspentTxnOutputs) < value) {
+            log.error("#Not Enough funds to send transaction. Transaction Discarded.");
+            return null;
+        }
+        //create array list of inputs
+        List<TransactionInput> inputs = Lists.newArrayList();
+
+        float total = 0;
+
+        final Map<String, TransactionOutput> utxosOfWallet = wallet.getUnspentTransactionOutputs();
+        for (Map.Entry<String, TransactionOutput> item: utxosOfWallet.entrySet()){
+            TransactionOutput UTXO = item.getValue();
+            total += UTXO.getValue();
+            inputs.add(new TransactionInput(UTXO.getId()));
+            if (total > value) {
+                break;
+            }
+        }
+
+        Transaction newTransaction = new Transaction(wallet.getPublicKey(), _recipient , value, inputs);
+        newTransaction.generateSignature(wallet.getPrivateKey());
+
+        for (TransactionInput input: inputs) {
+            utxosOfWallet.remove(input.getTransactionOutputId());
+        }
+        wallet.setUnspentTransactionOutputs(utxosOfWallet);
+
+        return newTransaction;
+    }
+
     @Override
     public TransactionOutput getUnspentTransactionOutput(final String transactionOutputId) {
         return unspentTxnOutputs.get(transactionOutputId);
@@ -182,4 +216,5 @@ public class BlockChainServiceImpl implements BlockChainService
     public TransactionOutput removeTransactionOutput(final TransactionInput txnInput) {
         final TransactionOutput unspentTransactionOutput = txnInput.getUnspentTransactionOutput();
         return unspentTxnOutputs.remove(unspentTransactionOutput.getId());
+    }
 }
