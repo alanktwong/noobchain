@@ -6,8 +6,6 @@ import com.pb.noobchain.domain.Block;
 
 public interface BlockChainService
 {
-    List<Block> myFirstChain();
-
     String serialize(final List<Block> blockChain);
 
     boolean validateChain(final List<Block> blockChain);

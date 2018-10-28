@@ -34,32 +34,6 @@ public class BlockChainServiceImpl implements BlockChainService
     }
 
     @Override
-    public List<Block> myFirstChain() {
-        final List<Block> blockChain = Lists.newLinkedList();
-        Block genesisBlock = createGenesis(blockChain);
-        blockChain.add(genesisBlock);
-
-        Block block2 = addBlock("2", genesisBlock, blockChain);
-        addBlock("3", block2, blockChain);
-
-        return blockChain;
-    }
-
-    private Block createGenesis(List<Block> blockChain) {
-        Block genesisBlock = new Block("1", HashUtil.PREVIOUS_HASH_OF_GENESIS);
-        log.debug("Hash for genesis block : {}", genesisBlock.getHash());
-        mineBlockAndAddToChain(genesisBlock, blockChain);
-        return genesisBlock;
-    }
-
-    private Block addBlock(String id, Block previous, List<Block> blockChain) {
-        Block block = new Block(id, previous.getHash());
-        log.debug("Hash for block {} : {}", block.getId(), block.getHash());
-        mineBlockAndAddToChain(block, blockChain);
-        return block;
-    }
-
-    @Override
     public String serialize(final List<Block> blockChain) {
         String json = new GsonBuilder().setPrettyPrinting().create().toJson(blockChain);
         log.info(json);

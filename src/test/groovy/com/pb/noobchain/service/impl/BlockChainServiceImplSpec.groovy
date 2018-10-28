@@ -4,18 +4,38 @@ import com.pb.noobchain.domain.Block
 import com.pb.noobchain.exceptions.BrokenChainException
 import com.pb.noobchain.exceptions.UnequalCurrentHashException
 import com.pb.noobchain.exceptions.UnminedChainException
+import com.pb.noobchain.repository.TransactionRepository
+import com.pb.noobchain.repository.impl.TransactionRepositoryImpl
+import com.pb.noobchain.service.BlockChainTestFactory
+import com.pb.noobchain.service.TransactionService
 import spock.lang.Specification
 
 class BlockChainServiceImplSpec extends Specification {
 
     BlockChainServiceImpl service
+
+    BlockChainTestFactory factory
+
+    TransactionService transactionService
+
+    TransactionRepository transactionRepository
+
     def difficulty = 5
 
     List<Block> chain
 
     def setup() {
         service = new BlockChainServiceImpl(difficulty: difficulty)
-        chain = service.myFirstChain()
+
+        transactionRepository = new TransactionRepositoryImpl()
+
+        transactionService = new TransactionServiceImpl(transactionRepository)
+        transactionService.minimumTransaction = -0.01
+
+        factory = new BlockChainTestFactory(transactionService: transactionService,
+            transactionRepository: transactionRepository,
+            blockChainService: service)
+        chain = factory.create()
     }
 
     def "serialize my 1st chain"() {

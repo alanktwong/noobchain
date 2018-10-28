@@ -2,10 +2,10 @@ package com.pb.noobchain.service.impl
 
 import com.pb.noobchain.domain.Block
 import com.pb.noobchain.domain.Transaction
-import com.pb.noobchain.domain.TransactionOutput
 import com.pb.noobchain.domain.Wallet
 import com.pb.noobchain.repository.TransactionRepository
 import com.pb.noobchain.repository.impl.TransactionRepositoryImpl
+import com.pb.noobchain.service.BlockChainTestFactory
 import com.pb.noobchain.service.HashUtil
 import com.pb.noobchain.service.BlockChainService
 import org.slf4j.Logger
@@ -104,37 +104,10 @@ class TransactionServiceImplSpec extends Specification {
 
     def "should create a valid blockChain of a transaction history"() {
         given:
-          List<Block> blockChain = []
-
-        and: "Create wallets"
-          Wallet coinBase = new Wallet("coinBase")
-          Wallet walletA = new Wallet("A")
-          Wallet walletB = new Wallet("B")
-
-        and:
-          LOG.info("Create genesis transaction, which sends 100 NoobCoin to wallet A")
-          Transaction genesisTransaction = createGenesis(coinBase, walletA, 100f)
-
-        and:
-          LOG.info("Creating and mining Genesis block... ")
-          Block genesis = new Block("genesis", HashUtil.PREVIOUS_HASH_OF_GENESIS)
-          service.addTransactionToBlock(genesisTransaction, genesis)
-          blockChainService.mineBlockAndAddToChain(genesis, blockChain)
-
-        and:
-          LOG.info("Wallet A is trying to send funds (40) to Wallet B ...")
-          Block block1 = new Block("1", genesis.getHash())
-          tryToSend(walletA, walletB, block1, blockChain, 40f)
-
-        and:
-          LOG.info("Wallet A is trying to send more funds (1000) than it has to Wallet B ...")
-          def block2 = new Block("2", block1.getHash())
-          tryToSend(walletA, walletB, block2, blockChain, 1000f)
-
-        and:
-          LOG.info("Wallet B is trying to send more funds (1000) than it has to Wallet A ...")
-          def block3 = new Block("3", block2.getHash())
-          tryToSend(walletB, walletA, block3, blockChain, 20f)
+          def factory = new BlockChainTestFactory(transactionService: service,
+              blockChainService: blockChainService,
+              transactionRepository: repo)
+          List<Block> blockChain = factory.create()
 
         when:
           def valid = blockChainService.validateChain(blockChain)
@@ -143,28 +116,5 @@ class TransactionServiceImplSpec extends Specification {
           valid
     }
 
-    def tryToSend(Wallet sender, Wallet recipient, Block block, List<Block> blockChain, float amount) {
-        LOG.info("\nSender [{}] initial balance: {}", sender.getId(), service.getBalance(sender))
-        def txn = service.sendFundsFromWallet(sender, recipient.getPublicKey(), amount)
-        service.addTransactionToBlock(txn, block)
-        blockChainService.mineBlockAndAddToChain(block, blockChain)
-        LOG.info("Sender [{}] final balance: {}", sender.getId(), service.getBalance(sender))
-        LOG.info("Recipient [{}] final balance: {}", recipient.getId(), service.getBalance(recipient))
-    }
 
-
-    Transaction createGenesis(Wallet coinbase, Wallet sender, float value = 100f) {
-        Transaction genesisTransaction = new Transaction(coinbase.publicKey, sender.getPublicKey(), value, null)
-        //manually sign the genesis transaction
-        genesisTransaction.generateSignature(coinbase.getPrivateKey())
-        //manually set the transaction id
-        genesisTransaction.transactionId = HashUtil.PREVIOUS_HASH_OF_GENESIS
-        //manually add the Transactions Output
-        def output = new TransactionOutput(genesisTransaction.getRecipient(), genesisTransaction.getValue(), genesisTransaction.getTransactionId())
-        genesisTransaction.outputs.add(output)
-
-        //its important to store our first transaction in the UTXOs list.
-        repo.addTransactionOutput(output)
-        genesisTransaction
-    }
 }
