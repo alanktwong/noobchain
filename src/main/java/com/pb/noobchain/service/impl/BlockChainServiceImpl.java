@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
-import com.google.common.collect.Lists;
 import com.pb.noobchain.domain.Block;
 import com.pb.noobchain.exceptions.BrokenChainException;
 import com.pb.noobchain.exceptions.UnequalCurrentHashException;
@@ -14,7 +13,6 @@ import com.pb.noobchain.exceptions.UnminedChainException;
 import com.pb.noobchain.service.BlockChainService;
 
 import com.google.gson.GsonBuilder;
-import com.pb.noobchain.service.HashUtil;
 
 public class BlockChainServiceImpl implements BlockChainService
 {
@@ -25,33 +23,6 @@ public class BlockChainServiceImpl implements BlockChainService
     public void setDifficulty(final int difficulty)
     {
         this.difficulty = difficulty;
-    }
-
-    @Override
-    public List<Block> myFirstChain() {
-        final List<Block> blockChain = Lists.newLinkedList();
-        Block genesisBlock = createGenesis(this.difficulty);
-        blockChain.add(genesisBlock);
-
-        Block block2 = addBlock(blockChain, "2", genesisBlock, this.difficulty);
-        addBlock(blockChain, "3", block2, this.difficulty);
-
-        return blockChain;
-    }
-
-    private Block createGenesis(int difficulty) {
-        Block genesisBlock = new Block("genesis", HashUtil.PREVIOUS_HASH_OF_GENESIS);
-        log.info("Hash for genesis block : {}", genesisBlock.getHash());
-        genesisBlock.mine(difficulty);
-        return genesisBlock;
-    }
-
-    private Block addBlock(List<Block> blockChain, String id, Block previous, int difficulty) {
-        Block block = new Block(id, previous.getHash());
-        log.info("Hash for block {} : {}", block.getId(), block.getHash());
-        block.mine(difficulty);
-        blockChain.add(block);
-        return block;
     }
 
     @Override
