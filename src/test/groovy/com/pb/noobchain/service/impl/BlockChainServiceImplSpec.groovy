@@ -22,7 +22,7 @@ class BlockChainServiceImplSpec extends Specification {
     def difficulty = 5
 
     def setup() {
-        service = new BlockChainServiceImpl()
+        service = new BlockChainServiceImpl(minimumTransaction: 0.01)
     }
 
     def "create my 1st chain"() {
@@ -107,11 +107,11 @@ class BlockChainServiceImplSpec extends Specification {
           thrown UnequalCurrentHashException
     }
 
-    def "should tamper with my 1st chain by changing data"() {
+    def "should tamper with my 1st chain by changing merkleRoot"() {
         given:
           def chain = service.myFirstChain(difficulty)
           def aBlock = chain.get(1)
-          aBlock.setData("tampering")
+          aBlock.setMerkleRoot("tampering")
 
         when:
           service.validateChain(chain, difficulty)
@@ -123,7 +123,7 @@ class BlockChainServiceImplSpec extends Specification {
     def "should tamper with my 1st chain by trying to append a block"() {
         given:
           def chain = service.myFirstChain(difficulty)
-          def newBlock = new Block("addding block", "foo")
+          def newBlock = new Block("adding evil block")
           chain.add(newBlock)
 
         when:
@@ -148,7 +148,7 @@ class BlockChainServiceImplSpec extends Specification {
     def "should tamper with my 1st chain by trying to add an unmined block"() {
         given:
           def chain = service.myFirstChain(difficulty)
-          def block = new Block(String.format("Im the %s block", 4), chain.get(2).getHash())
+          def block = new Block(chain.get(2).getHash())
           chain.add(block)
 
         when:
@@ -161,7 +161,7 @@ class BlockChainServiceImplSpec extends Specification {
     def "should add to my 1st chain by trying to add an mined block"() {
         given:
           def chain = service.myFirstChain(difficulty)
-          def block = new Block(String.format("Im the %s block", 4), chain.get(2).getHash())
+          def block = new Block(chain.get(2).getHash())
           block.mine(difficulty)
           chain.add(block)
 
