@@ -18,6 +18,8 @@ import com.pb.noobchain.domain.Transaction;
 
 public class HashUtil
 {
+    public static final String PREVIOUS_HASH_OF_GENESIS = "0";
+
     private static final Logger LOG = LoggerFactory.getLogger(HashUtil.class);
 
     //Applies Sha256 to a string and returns the result.
@@ -96,5 +98,4 @@ public class HashUtil
     {
         return new String(new char[difficulty]).replace('\0', '0');
     }
-
 }
