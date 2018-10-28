@@ -90,4 +90,10 @@ public class HashUtil
         LOG.debug("Computed merkle root: {}", merkleRoot);
         return merkleRoot;
     }
+
+    public static String createDifficultyString(final int difficulty)
+    {
+        return new String(new char[difficulty]).replace('\0', '0');
+    }
+
 }
