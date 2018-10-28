@@ -6,9 +6,19 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.util.Base64;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
+import com.pb.noobchain.domain.Transaction;
 
 public class HashUtil
 {
+    private static final Logger LOG = LoggerFactory.getLogger(HashUtil.class);
+
     //Applies Sha256 to a string and returns the result.
     public static String applySha256(String input){
         try {
@@ -58,5 +68,26 @@ public class HashUtil
 
     public static String getStringFromKey(Key key) {
         return Base64.getEncoder().encodeToString(key.getEncoded());
+    }
+
+    public static String getMerkleRoot(List<Transaction> transactions) {
+        int count = transactions.size();
+        List<String> previousTreeLayer = transactions.stream()
+            .map(Transaction::getTransactionId)
+            .collect(Collectors.toList());
+
+        List<String> treeLayer = previousTreeLayer;
+        while (count > 1) {
+            treeLayer = Lists.newArrayList();
+            // this looks like a classic FP reduce
+            for (int i=1; i < previousTreeLayer.size(); i++) {
+                treeLayer.add(applySha256(previousTreeLayer.get(i-1) + previousTreeLayer.get(i)));
+            }
+            count = treeLayer.size();
+            previousTreeLayer = treeLayer;
+        }
+        String merkleRoot = (treeLayer.size() == 1) ? treeLayer.get(0) : "";
+        LOG.debug("Computed merkle root: {}", merkleRoot);
+        return merkleRoot;
     }
 }
