@@ -9,4 +9,9 @@ import com.pb.noobchain.domain.Wallet;
 
 public interface TransactionDomainService
 {
+    TransactionOutput getUnspentTransactionOutput(final String transactionOutputId);
+
+    TransactionOutput addTransactionOutput(final TransactionOutput txnOutput);
+
+    TransactionOutput removeTransactionOutput(final TransactionInput txnInput);
 }

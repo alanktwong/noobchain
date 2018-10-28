@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.pb.noobchain.domain.Block;
 
-public interface BlockChainService
+public interface BlockChainService extends TransactionDomainService
 {
     List<Block> myFirstChain(int difficulty);
 
