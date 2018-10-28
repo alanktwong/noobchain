@@ -4,7 +4,24 @@ This application was generated using JHipster 4.6.2, you can find documentation 
 The purpose of this application is to expose in a JHipster monolith, a blockchain prototype
 
 * [Creating Your First Blockchain with Java. Part 1](https://medium.com/programmers-blockchain/create-simple-blockchain-java-tutorial-from-scratch-6eeed3cb03fa) or [its github](https://github.com/CryptoKass/NoobChain-Tutorial-Part-1)
-* [Creating Your First Blockchain with Java. Part 2 — Transactions](https://medium.com/programmers-blockchain/creating-your-first-blockchain-with-java-part-2-transactions-2cdac335e0ce) or [its github](https://github.com/CryptoKass/NoobChain-Tutorial-Part-2)
+* [Creating Your First Blockchain with Java. Part 2 — Transactions](https://medium.com/programmers-blockchain/creating-your-first-blockchain-with-java-part-2-transactions-2cdac335e0ce) or [its github](https://github.com/CryptoKass/NoobChain-Tutorial-Part-1) or [its github](https://github.com/CryptoKass/NoobChain-Tutorial-Part-2)
+
+## Domain model
+
+* Block chain is a linked list with blocks pointing to their predecesors
+** Each block can receive many transactions
+* Each transaction
+** has the public key of its sender
+** has the public key of its recipient
+** has many transaction inputs
+*** Each transaction input has an unspent transaction output
+** has many transaction outputs
+*** Each transaction output has the public key of its recipient
+*** Each transaction output belongs to a transaction
+* Each wallet
+** Has a private key
+** Has a public key
+** Owns unspent transaction outputs
 
 ## Development
 
