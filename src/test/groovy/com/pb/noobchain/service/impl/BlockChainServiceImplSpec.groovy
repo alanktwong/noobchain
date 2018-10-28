@@ -1,12 +1,22 @@
 package com.pb.noobchain.service.impl
 
 import com.pb.noobchain.domain.Block
+import com.pb.noobchain.domain.Transaction
+import com.pb.noobchain.domain.Wallet
 import com.pb.noobchain.exceptions.BrokenChainException
 import com.pb.noobchain.exceptions.UnequalCurrentHashException
 import com.pb.noobchain.exceptions.UnminedChainException
+import com.pb.noobchain.service.HashUtil
+import org.bouncycastle.jce.provider.BouncyCastleProvider
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import spock.lang.Specification
 
+import java.security.Security
+
 class BlockChainServiceImplSpec extends Specification {
+
+    private static final Logger LOG = LoggerFactory.getLogger(BlockChainServiceImplSpec)
 
     BlockChainServiceImpl service
     def difficulty = 5
@@ -174,4 +184,34 @@ class BlockChainServiceImplSpec extends Specification {
             mined != null && !mined.isEmpty()
             valid
     }
+
+
+    def "should create a verified transaction"() {
+
+        given: "set up Bouncy Castle as security provider"
+          Security.addProvider(new BouncyCastleProvider())
+
+        and: "Create 2 new wallets"
+          Wallet walletA = new Wallet()
+          LOG.info("Keys - Private {} and public {}",
+              HashUtil.getStringFromKey(walletA.getPrivateKey()),
+              HashUtil.getStringFromKey(walletA.getPublicKey()))
+          Wallet walletB = new Wallet()
+          LOG.info("Keys - Private {} and public {}",
+              HashUtil.getStringFromKey(walletB.getPrivateKey()),
+              HashUtil.getStringFromKey(walletB.getPublicKey()))
+
+        and: "Create a test transaction from walletA to walletB"
+          def inputs = null
+          Transaction transaction = new Transaction(walletA.getPublicKey(), walletB.getPublicKey(),
+              5, inputs)
+          transaction.generateSignature(walletA.getPrivateKey())
+
+        when: "Verify the signature works and verify it from the public key"
+          def verified = transaction.verifySignature()
+
+        then:
+          verified
+    }
+
 }
