@@ -1,6 +1,8 @@
 package com.pb.noobchain.domain;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
@@ -16,36 +18,41 @@ public class Block
 
     private String previousHash;
 
-    private String data; //our data will be a simple message BUT should be generified
+    public String merkleRoot;
+
+    //our data will be a simple message.
+    public List<Transaction> transactions = new ArrayList<>();
 
     private long timeStamp; //as number of milliseconds since 1/1/1970.
 
     private int nonce;
 
     //Block Constructor.
-    public Block(String data, String previousHash) {
-        this.data = data;
+    public Block(String previousHash) {
         this.previousHash = previousHash;
         this.timeStamp = new Date().getTime();
         this.hash = calculateHash();
     }
 
-    private String calculateHashImpl(String previousHash, long timeStamp, String data) {
+    private String calculateHashImpl(String previousHash, long timeStamp, String merkleRoot) {
         final String toHash = previousHash +
             Long.toString(timeStamp) +
             Integer.toString(nonce) +
-            data;
+            merkleRoot;
         return HashUtil.applySha256(toHash);
     }
 
     public String calculateHash() {
-        return calculateHashImpl(getPreviousHash(), getTimeStamp(), getData());
+        return calculateHashImpl(getPreviousHash(), getTimeStamp(), getMerkleRoot());
     }
 
     private void mineImpl(Block block, int difficulty) {
+        String merkleRoot = HashUtil.getMerkleRoot(block.getTransactions());
+        block.setMerkleRoot(merkleRoot);
+
         //Create a string with difficulty * "0"
-        String target = new String(new char[difficulty]).replace('\0', '0');
-        while (!block.getHash().substring( 0, difficulty).equals(target)) {
+        String target = HashUtil.createDifficultyString(difficulty);
+        while (!block.getHash().substring(0, difficulty).equals(target)) {
             int nonce = block.getNonce();
             nonce++;
             block.setNonce(nonce);
@@ -57,8 +64,6 @@ public class Block
     public void mine(int difficulty) {
        mineImpl(this, difficulty);
     }
-
-
 
     public String getHash()
     {
@@ -80,16 +85,6 @@ public class Block
         this.previousHash = previousHash;
     }
 
-    public String getData()
-    {
-        return data;
-    }
-
-    public void setData(final String data)
-    {
-        this.data = data;
-    }
-
     public long getTimeStamp()
     {
         return timeStamp;
@@ -108,6 +103,26 @@ public class Block
     public void setNonce(final int nonce)
     {
         this.nonce = nonce;
+    }
+
+    public String getMerkleRoot()
+    {
+        return merkleRoot;
+    }
+
+    public void setMerkleRoot(final String merkleRoot)
+    {
+        this.merkleRoot = merkleRoot;
+    }
+
+    public List<Transaction> getTransactions()
+    {
+        return transactions;
+    }
+
+    public void setTransactions(final List<Transaction> transactions)
+    {
+        this.transactions = transactions;
     }
 
     @Override

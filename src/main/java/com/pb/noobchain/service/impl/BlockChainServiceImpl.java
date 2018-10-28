@@ -29,6 +29,8 @@ public class BlockChainServiceImpl implements BlockChainService
 
     private Map<String,TransactionOutput> unspentTxnOutputs = new HashMap<>();
 
+    private static final String PREVIOUS_HASH_OF_GENESIS = "0";
+
     private float minimumTransaction = 0.00f;
 
     public void setMinimumTransaction(final float minimumTransaction)
@@ -49,14 +51,14 @@ public class BlockChainServiceImpl implements BlockChainService
     }
 
     private Block createGenesis(int difficulty) {
-        Block genesisBlock = new Block("Hi im the genesis block", "0");
+        Block genesisBlock = new Block(PREVIOUS_HASH_OF_GENESIS);
         log.info("Hash for genesis block : {}", genesisBlock.getHash());
         genesisBlock.mine(difficulty);
         return genesisBlock;
     }
 
     private Block addBlock(List<Block> blockChain, int index, Block previous, int difficulty) {
-        Block block = new Block(String.format("Im the %s block", index), previous.getHash());
+        Block block = new Block(previous.getHash());
         log.info("Hash for block {} : {}", index, block.getHash());
         block.mine(difficulty);
         blockChain.add(block);
@@ -170,6 +172,7 @@ public class BlockChainServiceImpl implements BlockChainService
         outputs.add(output);
     }
 
+    @Override
     public Transaction sendFundsToWallet(Wallet wallet, PublicKey _recipient, float value) {
         //gather balance and check funds.
         if (wallet.getBalance(this.unspentTxnOutputs) < value) {
