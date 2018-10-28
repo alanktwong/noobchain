@@ -40,10 +40,10 @@ class BlockChainServiceImplSpec extends Specification {
 
     def "serialize my 1st chain"() {
         when:
-            def json = service.serialize(chain)
+          def json = service.serialize(chain)
 
         then:
-            json != null && !json.isEmpty()
+          json != null && !json.isEmpty()
     }
 
     def "should tamper with my 1st chain by changing previous hash"() {
@@ -158,11 +158,11 @@ class BlockChainServiceImplSpec extends Specification {
 
     def "should try mining my 1st chain"() {
         when:
-            def mined = service.tryMining(chain)
-            def valid = service.validateChain(mined)
+          def mined = service.tryMining(chain)
+          def valid = service.validateChain(mined)
 
         then:
-            mined != null && !mined.isEmpty()
-            valid
+          mined != null && !mined.isEmpty()
+          valid
     }
 }

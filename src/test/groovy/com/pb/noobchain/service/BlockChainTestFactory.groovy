@@ -17,28 +17,28 @@ class BlockChainTestFactory {
     TransactionRepository transactionRepository
 
     List<Block> create() {
-      List<Block> blockChain = []
+        List<Block> blockChain = []
 
-      Wallet coinBase = new Wallet("coinBase")
-      Wallet walletA = new Wallet("A")
-      Wallet walletB = new Wallet("B")
+        Wallet coinBase = new Wallet("coinBase")
+        Wallet walletA = new Wallet("A")
+        Wallet walletB = new Wallet("B")
 
-      Transaction genesisTransaction = createGenesisTxn(coinBase, walletA, 100f)
+        Transaction genesisTransaction = createGenesisTxn(coinBase, walletA, 100f)
 
-      Block genesis = createGenesisBlock(genesisTransaction, blockChain)
+        Block genesis = createGenesisBlock(genesisTransaction, blockChain)
 
-      LOG.info("Wallet A is trying to send funds (40) to Wallet B ...")
-      Block block1 = new Block("1", genesis.getHash())
-      tryToSend(walletA, walletB, block1, blockChain, 40f)
+        LOG.info("Wallet A is trying to send funds (40) to Wallet B ...")
+        Block block1 = new Block("1", genesis.getHash())
+        tryToSend(walletA, walletB, block1, blockChain, 40f)
 
-      LOG.info("Wallet A is trying to send more funds (1000) than it has to Wallet B ...")
-      def block2 = new Block("2", block1.getHash())
-      tryToSend(walletA, walletB, block2, blockChain, 1000f)
+        LOG.info("Wallet A is trying to send more funds (1000) than it has to Wallet B ...")
+        def block2 = new Block("2", block1.getHash())
+        tryToSend(walletA, walletB, block2, blockChain, 1000f)
 
-      LOG.info("Wallet B is trying to send more funds (1000) than it has to Wallet A ...")
-      def block3 = new Block("3", block2.getHash())
-      tryToSend(walletB, walletA, block3, blockChain, 20f)
-      blockChain
+        LOG.info("Wallet B is trying to send more funds (1000) than it has to Wallet A ...")
+        def block3 = new Block("3", block2.getHash())
+        tryToSend(walletB, walletA, block3, blockChain, 20f)
+        blockChain
     }
 
     def tryToSend(Wallet sender, Wallet recipient, Block block, List<Block> blockChain, float amount) {

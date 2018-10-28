@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.pb.noobchain.domain.Transaction;
+import com.pb.noobchain.domain.Wallet;
 
 public class HashUtil
 {
@@ -113,11 +114,10 @@ public class HashUtil
             // Initialize the key generator and generate a KeyPair
             keyGen.initialize(ecSpec, random);   //256 bytes provides an acceptable security level
             keyPair = keyGen.generateKeyPair();
-        } catch(Exception ex) {
-            LOG.error("Failed to generate keyPair", ex);
+        } catch(Exception e) {
+            LOG.error("Failed to generate", e);
         }
         return Optional.ofNullable(keyPair);
     }
-
 
 }

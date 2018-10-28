@@ -15,13 +15,14 @@ public class Wallet {
     private PublicKey publicKey;
 
     //only UTXOs owned by this wallet.
-    private Map<String,TransactionOutput> unspentTransactionOutputs = Maps.newHashMap();
+    public Map<String,TransactionOutput> unspentTransactionOutputs = Maps.newHashMap();
 
-    public Wallet(String id){
+    public Wallet(final String id){
         this.id = id;
-        HashUtil.generateKeyPair().ifPresent(kp -> {
-            this.setPublicKey(kp.getPublic());
-            this.setPrivateKey(kp.getPrivate());
+        HashUtil.generateKeyPair().ifPresent(keyPair -> {
+            // Set the public and private keys from the keyPair
+            setPrivateKey(keyPair.getPrivate());
+            setPublicKey(keyPair.getPublic());
         });
     }
 
