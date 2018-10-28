@@ -9,7 +9,7 @@ public class Wallet {
     private PublicKey publicKey;
 
     public Wallet(){
-        generateKeyPair();
+        generateKeyPair(this);
     }
 
     public void generateKeyPair(Wallet wallet) {
