@@ -3,15 +3,10 @@ package com.pb.noobchain.domain;
 import java.security.*;
 import java.util.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.Lists;
 import com.pb.noobchain.service.HashUtil;
 
 public class Transaction {
-
-    private static final Logger LOG = LoggerFactory.getLogger(Transaction.class);
 
     // this is also the hash of the transaction.
     private String transactionId;
