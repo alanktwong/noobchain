@@ -113,7 +113,7 @@ public class TransactionServiceImpl implements TransactionService
     @Override
     public Transaction sendFundsFromWallet(Wallet fromWallet, PublicKey recipient, float value) {
         //gather balance and check funds.
-        if (fromWallet.getBalance(transactionRepository.getUnspentTxnOutputs()) < value) {
+        if (getBalance(fromWallet) < value) {
             log.error("#Not Enough funds to send transaction. Transaction Discarded.");
             return null;
         }
