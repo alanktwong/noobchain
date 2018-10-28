@@ -5,6 +5,7 @@ import com.pb.noobchain.domain.Transaction
 import com.pb.noobchain.domain.Wallet
 import com.pb.noobchain.repository.TransactionRepository
 import com.pb.noobchain.repository.impl.TransactionRepositoryImpl
+import com.pb.noobchain.service.BlockChainTestFactory
 import com.pb.noobchain.service.HashUtil
 import com.pb.noobchain.service.BlockChainService
 import org.slf4j.Logger
@@ -24,13 +25,13 @@ class TransactionServiceImplSpec extends Specification {
     def setup() {
         repo = new TransactionRepositoryImpl()
         blockChainService = new BlockChainServiceImpl()
+        blockChainService.setDifficulty(3)
 
         service = new TransactionServiceImpl(repo)
-        service.minimumTransaction = 0.01
+        service.minimumTransaction = -0.01
     }
 
     def "should create a verified transaction"() {
-
         given: "Create 2 new wallets"
           Wallet walletA = new Wallet("A")
           LOG.info("Keys - Private {} and public {}",
@@ -54,8 +55,7 @@ class TransactionServiceImplSpec extends Specification {
           verified
     }
 
-    def "should NOT process a transaction w/o inputs"() {
-
+    def "should process a transaction w/empty inputs"() {
         given: "Create 2 new wallets"
           Wallet walletA = new Wallet("A")
           Wallet walletB = new Wallet("B")
@@ -63,18 +63,17 @@ class TransactionServiceImplSpec extends Specification {
         and: "Create a test transaction from walletA to walletB"
           def inputs = []
           Transaction transaction = new Transaction(walletA.getPublicKey(), walletB.getPublicKey(),
-              5, inputs)
+              5.0, inputs)
           transaction.generateSignature(walletA.getPrivateKey())
 
         when: "Try to process the transaction"
           def verified = service.processTransaction(transaction)
 
         then:
-          !verified
+          verified
     }
 
     def "should send try to funds from walletA which does not have enough funds"() {
-
         given: "Create 2 new wallets"
           Wallet walletA = new Wallet("A")
           Wallet walletB = new Wallet("B")
@@ -87,16 +86,37 @@ class TransactionServiceImplSpec extends Specification {
     }
 
     def "should try to add null transaction to a block"() {
-
         given:
-          def chain = blockChainService.myFirstChain()
-          Block lastBlock = chain.last()
+          Wallet coinBase = new Wallet("coinBase")
+          Wallet walletA = new Wallet("A")
+
+        and:
+          def blockChain = []
+          def factory = new BlockChainTestFactory(transactionService: service,
+              blockChainService: blockChainService,
+              transactionRepository: repo)
+          def genesisTxn = factory.createGenesisTxn(coinBase, walletA, 100f)
+          def genesisBlock = factory.createGenesisBlock(genesisTxn, blockChain)
           Transaction txn = null
 
         when: "Verify the transaction has been processed"
-          def success = service.addTransactionToBlock(txn, lastBlock)
+          def success = service.addTransactionToBlock(txn, genesisBlock)
 
         then:
           !success
+    }
+
+    def "should create a valid blockChain of a transaction history"() {
+        given:
+          def factory = new BlockChainTestFactory(transactionService: service,
+              blockChainService: blockChainService,
+              transactionRepository: repo)
+          List<Block> blockChain = factory.create()
+
+        when:
+          def valid = blockChainService.validateChain(blockChain)
+
+        then:
+          valid
     }
 }
