@@ -46,14 +46,6 @@ class BlockChainServiceImplSpec extends Specification {
             json != null && !json.isEmpty()
     }
 
-    def "should validate my 1st chain"() {
-        when:
-            def valid = service.validateChain(chain)
-
-        then:
-            valid
-    }
-
     def "should tamper with my 1st chain by changing previous hash"() {
         given:
           def aBlock = chain.find{ it.id == "2"}
