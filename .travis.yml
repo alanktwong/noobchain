@@ -18,7 +18,9 @@ cache:
   directories:
     - node
     - node_modules
-    - $HOME/.gradle
+    - '$HOME/.sonar/cache'
+    - '$HOME/.gradle'
+    - '.gradle'
     - $HOME/.yarn-cache
 
 env:
@@ -27,7 +29,8 @@ env:
     - SPRING_OUTPUT_ANSI_ENABLED=ALWAYS
     - SPRING_JPA_SHOW_SQL=false
 
-sonarcloud:
+addons:
+  sonarcloud:
     organization: "alanktwong-github"
     token:
       secure: "AAhKZkWzjBAOtu9CKmDCRFtIH54Qg6YGzMLC0+Aj8fPLPLHJGkPOCxejtlDOY8KiLRl9PHbIwj+IwpfwsRucyIZZyvlrxEZub5E/R1w/1nHhH9ERU3ELzcrjmQAnQkzPXscjNJGdrOcAUzeOZDeL9KhDSF0h7fBdoG9tej1mu8Cu8ywFvIKt48s7AkRrr6CcEEkY1AVbV42QtLjKjgxpirJWAhwbsRBW4rtTnrUoF2NV9OQX1rd8wlwqJ9ICarPJJP5/Q0jRWKFdpI5q9SOOxunfgkhtxy8ZavNQf/lYFZejvAKAjY1swi9nJliaFms6fELEZej9k1PBxWdxU9Hhhc693BEUc8zeFyInEmlMCplvtkcFpjws285p31TiD2OZRG4Akaz6BRkiMlqQ6FTDXYrGxLoIhZKGBBWIPOEPNFQHwctKy6Z1qgRSQ7jmKqEuRMxjlTVrSmWg3WBsENa0oUoxmLzd5EZyIyWvzHnzNjmd3r3r4x3Uzh9IDrHQe6LgBFPZ6NNHtzF7h4u+IO4ZL48m61MRYI5RcdgpDe2p0bphez9yo8ua+I6BinFAcxIaEbiCKL2ephVF1Hg/5CAZknbPj98L3vs2cImPAkNuWZJ5fnyQSSynHPk55gnWujk2/oxoPYhjZRu/UqWGY+xCmIj/tBPp9aaRXrlPzamwQzc="
@@ -48,6 +51,7 @@ script:
   - chmod +x gradlew
   - ./gradlew clean test
   - yarn test
+  - ./gradlew sonarqube
   - ./gradlew bootRepackage -Pprod -x test
 
 notifications:

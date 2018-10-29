@@ -116,8 +116,7 @@ if (project.hasProperty('prometheus')) {
 
 group = 'com.pb.noobchain'
 version = '0.0.1-SNAPSHOT'
-
-description = ''
+description = 'jHipster with BlockChain POC'
 
 configurations {
     providedRuntime
