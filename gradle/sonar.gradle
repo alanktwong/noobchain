@@ -13,7 +13,7 @@ jacocoTestReport {
 
 sonarqube {
     properties {
-        property "sonar.projectName", "jHipster/BlockChain project analyzed on SonarCloud using Travis"
+        property "sonar.projectName", "jHipster_noobchain"
         property "sonar.projectKey", "alanktwong_noobchain"
     }
 }
