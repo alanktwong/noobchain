@@ -1,12 +1,8 @@
 package com.pb.noobchain.service;
 
-import com.pb.noobchain.config.audit.AuditEventConverter;
-import com.pb.noobchain.repository.PersistenceAuditEventRepository;
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -16,34 +12,11 @@ import java.util.Optional;
  * <p>
  * This is the default implementation to support SpringBoot Actuator AuditEventRepository
  */
-@Service
-@Transactional
-public class AuditEventService {
+public interface AuditEventService {
 
-    private final PersistenceAuditEventRepository persistenceAuditEventRepository;
+    Page<AuditEvent> findAll(Pageable pageable);
 
-    private final AuditEventConverter auditEventConverter;
+    Page<AuditEvent> findByDates(Instant fromDate, Instant toDate, Pageable pageable);
 
-    public AuditEventService(
-        PersistenceAuditEventRepository persistenceAuditEventRepository,
-        AuditEventConverter auditEventConverter) {
-
-        this.persistenceAuditEventRepository = persistenceAuditEventRepository;
-        this.auditEventConverter = auditEventConverter;
-    }
-
-    public Page<AuditEvent> findAll(Pageable pageable) {
-        return persistenceAuditEventRepository.findAll(pageable)
-            .map(auditEventConverter::convertToAuditEvent);
-    }
-
-    public Page<AuditEvent> findByDates(Instant fromDate, Instant toDate, Pageable pageable) {
-        return persistenceAuditEventRepository.findAllByAuditEventDateBetween(fromDate, toDate, pageable)
-            .map(auditEventConverter::convertToAuditEvent);
-    }
-
-    public Optional<AuditEvent> find(Long id) {
-        return Optional.ofNullable(persistenceAuditEventRepository.findOne(id)).map
-            (auditEventConverter::convertToAuditEvent);
-    }
+    Optional<AuditEvent> find(Long id);
 }

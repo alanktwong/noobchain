@@ -5,6 +5,8 @@ import com.pb.noobchain.config.audit.AuditEventConverter;
 import com.pb.noobchain.domain.PersistentAuditEvent;
 import com.pb.noobchain.repository.PersistenceAuditEventRepository;
 import com.pb.noobchain.service.AuditEventService;
+import com.pb.noobchain.service.impl.AuditEventServiceImpl;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -65,7 +67,7 @@ public class AuditResourceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         AuditEventService auditEventService =
-            new AuditEventService(auditEventRepository, auditEventConverter);
+            new AuditEventServiceImpl(auditEventRepository, auditEventConverter);
         AuditResource auditResource = new AuditResource(auditEventService);
         this.restAuditMockMvc = MockMvcBuilders.standaloneSetup(auditResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
