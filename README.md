@@ -175,7 +175,7 @@ To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`)
 
 We're using the following CI tools, after following [this blog post](https://sivalabs.in/2018/01/ci-cd-springboot-applications-using-travis-ci/):
 
-* [Travis CI](https://travis-ci.org/)
+* [Travis CI](https://travis-ci.org/). The Travis gem works with Ruby 2.3.3
 * [Sonar Cloud](https://sonarcloud.io). Also see [Sonar Qube Scanner for Gradle](https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner+for+Gradle)
 
 
