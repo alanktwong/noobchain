@@ -27,16 +27,27 @@ public class HashUtil
 
     private static final Logger LOG = LoggerFactory.getLogger(HashUtil.class);
 
+    private static final String ECDSA = "ECDSA";
+    private static final String BC = "BC";
+    private static final String SHA_256 = "SHA-256";
+    public static final String UTF_8 = "UTF-8";
+
+    private HashUtil() {
+        super();
+    }
+
     //Applies Sha256 to a string and returns the result.
     public static String applySha256(String input){
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            MessageDigest digest = MessageDigest.getInstance(SHA_256);
             //Applies sha256 to our input,
-            byte[] hash = digest.digest(input.getBytes("UTF-8"));
-            StringBuffer hexString = new StringBuffer(); // This will contain hash as hexidecimal
+            byte[] hash = digest.digest(input.getBytes(UTF_8));
+            StringBuilder hexString = new StringBuilder(); // This will contain hash as hexidecimal
             for (int i = 0; i < hash.length; i++) {
                 String hex = Integer.toHexString(0xff & hash[i]);
-                if(hex.length() == 1) hexString.append('0');
+                if (hex.length() == 1){
+                    hexString.append('0');
+                }
                 hexString.append(hex);
             }
             return hexString.toString();
@@ -50,7 +61,7 @@ public class HashUtil
         Signature dsa;
         byte[] output = new byte[0];
         try {
-            dsa = Signature.getInstance("ECDSA", "BC");
+            dsa = Signature.getInstance(ECDSA, BC);
             dsa.initSign(privateKey);
             byte[] strByte = input.getBytes();
             dsa.update(strByte);
@@ -65,7 +76,7 @@ public class HashUtil
     //Verifies a String signature
     public static boolean verifyECDSASig(PublicKey publicKey, String data, byte[] signature) {
         try {
-            Signature ecdsaVerify = Signature.getInstance("ECDSA", "BC");
+            Signature ecdsaVerify = Signature.getInstance(ECDSA, BC);
             ecdsaVerify.initVerify(publicKey);
             ecdsaVerify.update(data.getBytes());
             return ecdsaVerify.verify(signature);

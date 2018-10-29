@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
+import com.google.common.base.Preconditions;
 import com.pb.noobchain.domain.Block;
 import com.pb.noobchain.exceptions.BrokenChainException;
 import com.pb.noobchain.exceptions.UnequalCurrentHashException;
@@ -37,7 +38,7 @@ public class BlockChainServiceImpl implements BlockChainService
         Block currentBlock;
         Block previousBlock;
         String hashTarget = new String(new char[difficulty]).replace('\0', '0');
-        Assert.isTrue(blockChain.size() >= 1);
+        Preconditions.checkArgument(blockChain.size() >= 1, "Can only validate chains that have more than the genesis block");
 
         //loop through blockchain to check hashes:
         for (int i=1; i < blockChain.size(); i++) {

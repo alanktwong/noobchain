@@ -40,7 +40,7 @@ public class Block
         this.hash = calculateHash();
     }
 
-    private String calculateHashImpl(String previousHash, long timeStamp, String merkleRoot) {
+    private String calculateHashImpl(String previousHash, int nonce, long timeStamp, String merkleRoot) {
         final String toHash = previousHash +
             Long.toString(timeStamp) +
             Integer.toString(nonce) +
@@ -49,7 +49,7 @@ public class Block
     }
 
     public String calculateHash() {
-        return calculateHashImpl(getPreviousHash(), getTimeStamp(), getMerkleRoot());
+        return calculateHashImpl(getPreviousHash(), getNonce(), getTimeStamp(), getMerkleRoot());
     }
 
     private boolean mineImpl(Block block, int difficulty) {
@@ -57,15 +57,15 @@ public class Block
             log.info("Block {} already mined!!!", block.getId());
             return isMined();
         }
-        String merkleRoot = HashUtil.getMerkleRoot(block.getTransactions());
-        block.setMerkleRoot(merkleRoot);
+        String newMerkleRoot = HashUtil.getMerkleRoot(block.getTransactions());
+        block.setMerkleRoot(newMerkleRoot);
 
         //Create a string with difficulty * "0"
         String target = HashUtil.createDifficultyString(difficulty);
         while (!block.getHash().substring(0, difficulty).equals(target)) {
-            int nonce = block.getNonce();
-            nonce++;
-            block.setNonce(nonce);
+            int newNonce = block.getNonce();
+            newNonce++;
+            block.setNonce(newNonce);
             block.setHash(block.calculateHash());
         }
         this.mined = true;
