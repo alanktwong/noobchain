@@ -17,6 +17,7 @@ import java.net.URLEncoder;
 public final class PaginationUtil {
 
     private PaginationUtil() {
+        super();
     }
 
     public static HttpHeaders generatePaginationHttpHeaders(Page page, String baseUrl) {
@@ -51,7 +52,7 @@ public final class PaginationUtil {
         try {
             escapedQuery = URLEncoder.encode(query, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Total-Count", Long.toString(page.getTotalElements()));

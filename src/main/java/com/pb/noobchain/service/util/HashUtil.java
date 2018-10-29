@@ -30,7 +30,9 @@ public class HashUtil
     private static final String ECDSA = "ECDSA";
     private static final String BC = "BC";
     private static final String SHA_256 = "SHA-256";
-    public static final String UTF_8 = "UTF-8";
+    private static final String UTF_8 = "UTF-8";
+    private static final String SHA_1_PRNG = "SHA1PRNG";
+    private static final String PRIME_192_V_1 = "prime192v1";
 
     private HashUtil() {
         super();
@@ -118,9 +120,9 @@ public class HashUtil
     public static Optional<KeyPair> generateKeyPair() {
         KeyPair keyPair = null;
         try {
-            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("ECDSA","BC");
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-            ECGenParameterSpec ecSpec = new ECGenParameterSpec("prime192v1");
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance(ECDSA,BC);
+            SecureRandom random = SecureRandom.getInstance(SHA_1_PRNG);
+            ECGenParameterSpec ecSpec = new ECGenParameterSpec(PRIME_192_V_1);
             // Initialize the key generator and generate a KeyPair
             keyGen.initialize(ecSpec, random);   //256 bytes provides an acceptable security level
             keyPair = keyGen.generateKeyPair();

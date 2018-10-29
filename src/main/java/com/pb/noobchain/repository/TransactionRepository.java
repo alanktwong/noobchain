@@ -7,6 +7,10 @@ import com.pb.noobchain.domain.TransactionOutput;
 
 public interface TransactionRepository
 {
+    void saveTransactionCount(int sequence);
+
+    int countTransactions();
+
     Map<String, TransactionOutput> getUnspentTxnOutputs();
 
     TransactionOutput getUnspentTransactionOutput(final String transactionOutputId);

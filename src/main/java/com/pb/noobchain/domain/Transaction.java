@@ -17,7 +17,7 @@ public class Transaction {
     private PublicKey recipient;
 
     // Planned amount to send
-    public float value;
+    private float value;
 
     // this cryptographic signature proves the owner of the address is the
     // one sending this transaction and that the data hasn’t been changed.

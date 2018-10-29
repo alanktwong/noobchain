@@ -9,7 +9,17 @@ import com.pb.noobchain.repository.TransactionRepository;
 
 public class TransactionRepositoryImpl implements TransactionRepository
 {
+    // a rough count of how many transactions have been generated.
+    private int sequence = 0;
     private Map<String,TransactionOutput> unspentTxnOutputs = new HashMap<>();
+
+    public void saveTransactionCount(int sequence) {
+        this.sequence = sequence;
+    }
+
+    public int countTransactions() {
+        return this.sequence;
+    }
 
     @Override
     public TransactionOutput getUnspentTransactionOutput(final String transactionOutputId) {

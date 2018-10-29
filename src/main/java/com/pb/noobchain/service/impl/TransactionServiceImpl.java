@@ -23,8 +23,6 @@ import com.pb.noobchain.service.TransactionService;
 
 public class TransactionServiceImpl implements TransactionService
 {
-    // a rough count of how many transactions have been generated.
-    private static int SEQUENCE = 0;
 
     private static final Logger log = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
@@ -124,9 +122,9 @@ public class TransactionServiceImpl implements TransactionService
 
         final Map<String, TransactionOutput> utxosOfWallet = fromWallet.getUnspentTransactionOutputs();
         for (Map.Entry<String, TransactionOutput> item: utxosOfWallet.entrySet()){
-            TransactionOutput UTXO = item.getValue();
-            total += UTXO.getValue();
-            inputs.add(new TransactionInput(UTXO.getId()));
+            TransactionOutput unspentTxnOutput = item.getValue();
+            total += unspentTxnOutput.getValue();
+            inputs.add(new TransactionInput(unspentTxnOutput.getId()));
             if (total > value) {
                 break;
             }
@@ -149,12 +147,9 @@ public class TransactionServiceImpl implements TransactionService
         if (transaction == null) {
             return false;
         }
-        if (!HashUtil.PREVIOUS_HASH_OF_GENESIS.equals(block.getPreviousHash())) {
-
-            if (processTransaction(transaction)) {
-                log.error("Transaction failed to process. Discarded.");
-                return false;
-            }
+        if (!HashUtil.PREVIOUS_HASH_OF_GENESIS.equals(block.getPreviousHash()) && processTransaction(transaction)) {
+            log.error("Transaction failed to process. Discarded.");
+            return false;
         }
         final List<Transaction> transactions = block.getTransactions();
         transactions.add(transaction);
@@ -166,11 +161,13 @@ public class TransactionServiceImpl implements TransactionService
     // This calculates the transaction hash (which will be used as its Id)
     private String calculateHash(Transaction txn) {
         //increase the sequence to avoid 2 identical transactions having the same hash
-        SEQUENCE++;
+        int sequence = transactionRepository.countTransactions();
+        sequence++;
         final String input = HashUtil.getStringFromKey(txn.getSender()) +
             HashUtil.getStringFromKey(txn.getRecipient()) +
             Float.toString(txn.getValue()) +
-            SEQUENCE;
+            sequence;
+        transactionRepository.saveTransactionCount(sequence);
         return HashUtil.applySha256(input);
     }
 
