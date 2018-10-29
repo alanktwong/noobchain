@@ -1,7 +1,9 @@
-package com.pb.noobchain.service;
+package com.pb.noobchain.service.impl;
 
 import com.pb.noobchain.NoobchainApp;
 import com.pb.noobchain.domain.User;
+import com.pb.noobchain.service.MailService;
+
 import io.github.jhipster.config.JHipsterProperties;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +32,8 @@ import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = NoobchainApp.class)
-public class MailServiceIntTest {
+public class MailServiceImplIntTest
+{
 
     @Autowired
     private JHipsterProperties jHipsterProperties;
@@ -53,7 +56,7 @@ public class MailServiceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         doNothing().when(javaMailSender).send(any(MimeMessage.class));
-        mailService = new MailService(jHipsterProperties, javaMailSender, messageSource, templateEngine);
+        mailService = new MailServiceImpl(jHipsterProperties, javaMailSender, messageSource, templateEngine);
     }
 
     @Test
