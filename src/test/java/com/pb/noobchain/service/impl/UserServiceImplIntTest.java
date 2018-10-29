@@ -1,9 +1,10 @@
-package com.pb.noobchain.service;
+package com.pb.noobchain.service.impl;
 
 import com.pb.noobchain.NoobchainApp;
 import com.pb.noobchain.domain.User;
 import com.pb.noobchain.config.Constants;
 import com.pb.noobchain.repository.UserRepository;
+import com.pb.noobchain.service.UserService;
 import com.pb.noobchain.service.dto.UserDTO;
 import com.pb.noobchain.service.util.RandomUtil;
 import org.junit.Test;
@@ -31,7 +32,8 @@ import static org.assertj.core.api.Assertions.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = NoobchainApp.class)
 @Transactional
-public class UserServiceIntTest {
+public class UserServiceImplIntTest
+{
 
     @Autowired
     private UserRepository userRepository;
