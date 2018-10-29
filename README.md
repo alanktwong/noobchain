@@ -173,6 +173,12 @@ For more information refer to [Using Docker and Docker-Compose][], this page als
 
 To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`), this will let you generate configuration files for a number of Continuous Integration systems. Consult the [Setting up Continuous Integration][] page for more information.
 
+We're using the following CI tools, after following [this blog post](https://sivalabs.in/2018/01/ci-cd-springboot-applications-using-travis-ci/):
+
+* [Travis CI](https://travis-ci.org/)
+* [Sonar Cloud](https://sonarcloud.io). Also see [Sonar Qube Scanner for Gradle](https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner+for+Gradle)
+
+
 [JHipster Homepage and latest documentation]: https://jhipster.github.io
 [JHipster 4.6.2 archive]: https://jhipster.github.io/documentation-archive/v4.6.2
 
