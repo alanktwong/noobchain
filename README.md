@@ -13,19 +13,19 @@ The purpose of this application is to expose in a JHipster monolith, a blockchai
 ## Domain model
 
 * Block chain is a linked list with blocks pointing to their predecesors
-** Each block can receive many transactions
+    + Each block can receive many transactions
 * Each transaction
-** has the public key of its sender
-** has the public key of its recipient
-** has many transaction inputs
-*** Each transaction input has an unspent transaction output
-** has many transaction outputs
-*** Each transaction output has the public key of its recipient
-*** Each transaction output belongs to a transaction
-* Each wallet
-** Has a private key
-** Has a public key
-** Owns unspent transaction outputs
+    + has the public key of its sender
+    + has the public key of its recipient
+    + has many transaction inputs
+        - Each transaction input has an unspent transaction output
+    + has many transaction outputs
+        - Each transaction output has the public key of its recipient
+        - Each transaction output belongs to a transaction
+* Each wallet can participate in a transaction
+    + Has a private key
+    + Has a public key
+        - Owns unspent transaction outputs
 
 ## Development
 
