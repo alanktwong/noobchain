@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/alanktwong/noobchain.svg?branch=master)](https://travis-ci.org/alanktwong/noobchain)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 # noobchain
 This application was generated using JHipster 4.6.2, you can find documentation and help at [https://jhipster.github.io/documentation-archive/v4.6.2](https://jhipster.github.io/documentation-archive/v4.6.2).
 
