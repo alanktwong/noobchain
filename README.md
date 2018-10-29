@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/alanktwong/noobchain.svg?branch=master)](https://travis-ci.org/alanktwong/noobchain)
+[![SonarCloud Status](https://sonarcloud.io/api/project_badges/measure?project=alanktwong_noobchain&metric=alert_status)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # noobchain
