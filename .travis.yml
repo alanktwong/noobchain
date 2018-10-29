@@ -48,10 +48,9 @@ install:
   - yarn install
 
 script:
+  - yarn test
   - chmod +x gradlew
   - ./gradlew clean test
-  - yarn test
-  - ./gradlew sonarqube
   - ./gradlew bootRepackage -Pprod -x test
 
 notifications:
